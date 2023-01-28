@@ -1,0 +1,19 @@
+﻿/UserSettings/
+/ProjectSettings/
+/Library/
+/Packages/
+/obj/
+/venv/
+/Logs/
+/.vs/
+/.idea/
+/Assets/TextMesh Pro
+/Assets/sprites
+
+**/*.meta
+**/.idea
+.vsconfig
+Assembly-CSharp.csproj
+GolfGame.sln.DotSettings.user
+GolfGame.sln
+/Temp
