@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    // Start is called before the first frame update
     public float speed;
     public float camSpeed;
     public GameObject cam;
@@ -24,7 +23,6 @@ public class CameraController : MonoBehaviour
         for (int i = 1; i < 22; i++)
         {
             distances.Add((int) Mathf.Pow(distances[i - 1], 1.02f));
-            Debug.Log((int) Mathf.Pow(distances[i - 1], 1.02f));
         }
         distances.Reverse();
         distanceIndex = 18;
@@ -61,12 +59,6 @@ public class CameraController : MonoBehaviour
         {
             int newIndex = distanceIndex + (int)Input.mouseScrollDelta.y;
             distanceIndex = isValidDistanceIndex(newIndex) ? newIndex : distanceIndex;
-            /*
-            newPos = new Vector3(0, 0, Input.mouseScrollDelta.y) * camSpeed + cam.transform.localPosition;
-            newPos.z = MathUtil.RoundToMultiple(newPos.z, camSpeed);
-            Debug.Log(newPos);*/
-
-            //cam.transform.localPosition = newPos;
         }
     }
 

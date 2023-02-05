@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-[InitializeOnLoad]
+
+
 public class Startup
 {
     // run startup routine
-    static Startup()
+    [RuntimeInitializeOnLoadMethod]    
+    public static void OnStartup()
     {
         SettingManager.LoadSettings();
     }
