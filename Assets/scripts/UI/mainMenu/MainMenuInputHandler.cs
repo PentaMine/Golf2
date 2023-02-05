@@ -19,14 +19,19 @@ public class MainMenuButtonHandler : MonoBehaviour
 
     public void Exit()
     {
-        Settings.SaveSettings();
+        SettingManager.SaveSettings();
         Application.Quit();
+    }
+
+    public void ToMultiplayer()
+    {
+        SceneManager.LoadScene("MultiplayerMenu");
     }
 
     public void ChangeLanguage()
     {
         // change the language from cro to eng or from eng to cro depending on the current language
-        Settings.language = Settings.language == Settings.Language.ENGLISH ? Settings.Language.CROATIAN : Settings.Language.ENGLISH;
-        Settings.SaveSettings();
+        SettingManager.settings.lang = SettingManager.settings.lang == SettingManager.Language.ENGLISH ? SettingManager.Language.CROATIAN : SettingManager.Language.ENGLISH;
+        SettingManager.SaveSettings();
     }
 }

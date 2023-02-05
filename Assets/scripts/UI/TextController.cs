@@ -19,7 +19,7 @@ public class TextController : MonoBehaviour
 
     void FixedUpdate()
     {
-        txtComp.text = Settings.language == Settings.Language.ENGLISH ? engTxt : croTxt;
+        txtComp.text = SettingManager.settings.lang == SettingManager.Language.ENGLISH ? engTxt : croTxt;
         if (isAllUpper)
         {
             txtComp.text = txtComp.text.ToUpper();

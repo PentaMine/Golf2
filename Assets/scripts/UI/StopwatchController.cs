@@ -17,8 +17,8 @@ public class StopwatchController : MonoBehaviour
 
     void Update()
     {
-        txtComp.text = (Settings.language == Settings.Language.ENGLISH ? EngPrefix : CroPrefix)
+        txtComp.text = (SettingManager.settings.lang == SettingManager.Language.ENGLISH ? EngPrefix : CroPrefix)
                        + GameManager.instance.GetGameDuration().ToString("0.00")
-                       + (Settings.language == Settings.Language.ENGLISH ? EngSuffix : CroSuffix);
+                       + (SettingManager.settings.lang == SettingManager.Language.ENGLISH ? EngSuffix : CroSuffix);
     }
 }

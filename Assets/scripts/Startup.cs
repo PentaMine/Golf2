@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
-public class Startup : MonoBehaviour
+[InitializeOnLoad]
+public class Startup
 {
     // run startup routine
-    private void Start()
+    static Startup()
     {
-        Settings.LoadSettings();
+        SettingManager.LoadSettings();
     }
 }

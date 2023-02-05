@@ -14,13 +14,19 @@ public class PuttCounterController : MonoBehaviour
     {
         PlayerController.onPlayerShoot += OnPlayerShoot;
         txtComp = GetComponent<TextMeshProUGUI>();
+        UpdateCounter();
     }
 
     void OnPlayerShoot(Vector3 force)
     {
+        UpdateCounter();
+    }
+
+    void UpdateCounter()
+    {
         putts++;
-        txtComp.text = (Settings.language == Settings.Language.ENGLISH ? EngPrefix : CroPrefix)
+        txtComp.text = (SettingManager.settings.lang == SettingManager.Language.ENGLISH ? EngPrefix : CroPrefix)
                        + putts.ToString()
-                       + (Settings.language == Settings.Language.ENGLISH ? EngSuffix : CroSuffix);
+                       + (SettingManager.settings.lang == SettingManager.Language.ENGLISH ? EngSuffix : CroSuffix);
     }
 }

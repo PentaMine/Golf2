@@ -45,15 +45,17 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // set the pos of the player object responsible for the camera, it is not a child of the object because
+        // children inherit the rotation and at that point setting the rotation every frame is the same as setting the pos
+        player.transform.position = transform.position;
+        
         // unallow player input if the game ended
         if (gameManager.state == GameManager.GameState.END || gameManager.isPaused)
         {
             return;
         }
 
-        // set the pos of the player object responsible for the camera, it is not a child of the object because
-        // children inherit the rotation and at that point setting the rotation every frame is the same as seting the pos
-        player.transform.position = transform.position;
+        // render the launch indicator if the ball is stationary
         indicatorRenderer.enabled = isStationary;
         // unlock y axis movement if the player is near the start or the hole, else lock it
         Vector3 vel = rb.velocity;
