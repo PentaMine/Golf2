@@ -24,9 +24,9 @@ public class PuttCounterController : MonoBehaviour
 
     void UpdateCounter()
     {
-        putts++;
         txtComp.text = (SettingManager.settings.lang == SettingManager.Language.ENGLISH ? EngPrefix : CroPrefix)
                        + putts.ToString()
                        + (SettingManager.settings.lang == SettingManager.Language.ENGLISH ? EngSuffix : CroSuffix);
+        putts++;
     }
 }

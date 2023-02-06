@@ -48,7 +48,8 @@ public class PlayerController : MonoBehaviour
         // set the pos of the player object responsible for the camera, it is not a child of the object because
         // children inherit the rotation and at that point setting the rotation every frame is the same as setting the pos
         player.transform.position = transform.position;
-        
+        launchIndicator.transform.position = new Vector3(transform.position.x, 0.02f, transform.position.z);
+
         // unallow player input if the game ended
         if (gameManager.state == GameManager.GameState.END || gameManager.isPaused)
         {
@@ -115,7 +116,7 @@ public class PlayerController : MonoBehaviour
 
                     // apply all of the calculated values to the segment
                     GameObject stripSegment = launchStripSegments[i - 1];
-                    stripSegment.transform.position = pos - new Vector3(0, pos.y - 0.01f, 0);
+                    stripSegment.transform.position = pos - new Vector3(0, pos.y - 0.02f, 0);
                     stripSegment.transform.rotation = Quaternion.Euler(newEuler);
                     stripSegment.transform.localScale = new Vector3(1, 1, distanceUnit);
                     stripSegment.GetComponentInChildren<MeshRenderer>().enabled = true; // make the segment visible
@@ -132,6 +133,7 @@ public class PlayerController : MonoBehaviour
         }
         else if (prevClick)
         {
+            // launch the player
             if (forceToBeApplied != Vector3.zero)
             {
                 rb.AddForce(forceToBeApplied * -100 * launchForce);
@@ -141,21 +143,29 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            /*
             Vector3 posDelta = new Vector3(transform.position.x - cam.transform.position.x, 0,
                 transform.position.z - cam.transform.position.z);
+            launchIndicator.transform.rotation = Quaternion.Euler(new Vector3(0, Mathf.Atan2(posDelta.x, posDelta.z), 0));*/
+        }
 
-            launchIndicator.transform.rotation = Quaternion.Euler(new Vector3(0, Mathf.Atan2(posDelta.x, posDelta.z), 0));
-            launchIndicator.transform.position = new Vector3(transform.position.x, 0.02f, transform.position.z);
-            launchIndicator.transform.localScale = new Vector3(.1f, 1, .1f);
-            for (int i = 0; i < 10; i++)
-            {
-                launchStripSegments[i].GetComponentInChildren<MeshRenderer>().enabled = false;
-            }
+        // Make launch strip segments invisible if the player let go of the left click
+        if (Input.GetMouseButtonUp(0))
+        {
+            DisableRenderingSegments();
         }
     }
 
     private bool ShouldDie()
     {
         return transform.position.y < -10 || transform.position.y > 100;
+    }
+
+    private void DisableRenderingSegments()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            launchStripSegments[i].GetComponentInChildren<MeshRenderer>().enabled = false;
+        }
     }
 }

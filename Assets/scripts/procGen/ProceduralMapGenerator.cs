@@ -96,14 +96,14 @@ public class ProceduralMapGenerator : MonoBehaviour
 
     void RunPathGeneration()
     {
-        string command = "python.exe ../../procGen/main.py";
+        string command = "python.exe ../procGen/";
         string arguments = "/B";
 
         Process process = new Process();
 
         process.StartInfo.FileName = "cmd.exe";
         process.StartInfo.Arguments = $"/C {command} {arguments}";
-        process.StartInfo.WorkingDirectory = "./venv/Scripts";
+        process.StartInfo.WorkingDirectory = "./venv";
         process.StartInfo.UseShellExecute = false;
         //process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.CreateNoWindow = true;

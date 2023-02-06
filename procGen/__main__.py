@@ -13,18 +13,19 @@ write_text = "x,y\n"
 for i in range(len(path)):
     write_text += f"{path[i].x},{path[i].y}" + ("\n" if i < len(path) - 1 else "")
 
-with open("../../path.csv", "w") as f:
+with open("../path.csv", "w") as f:
     f.write(write_text)
 
 write_text = "x,y\n"
 for i in range(len(boost_pads)):
     write_text += f"{boost_pads[i].pos.x},{boost_pads[i].pos.y}" + ("\n" if i < len(boost_pads) - 1 else "")
 
-with open("../../boost.csv", "w") as f:
+with open("../boost.csv", "w") as f:
     f.write(write_text)
-
+"""
 write_text = "x,y\n"
 for i in range(len(barriers)):
     write_text += f"{barriers[i].x},{barriers[i].y}" + ("\n" if i < len(barriers) - 1 else "")
-with open("../../barrier.csv", "w") as f:
+with open("../barrier.csv", "w") as f:
     f.write(write_text)
+"""
