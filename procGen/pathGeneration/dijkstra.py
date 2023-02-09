@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from config import *
 from pathGeneration import Node
 
@@ -49,7 +48,7 @@ def get_path(node):
     return path
 
 
-def findPath(graph, start, end):
+def find_path(graph, start, end):
     def get_binary(var):
         return int(var == "#")
 

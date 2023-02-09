@@ -22,10 +22,3 @@ for i in range(len(boost_pads)):
 
 with open("../boost.csv", "w") as f:
     f.write(write_text)
-"""
-write_text = "x,y\n"
-for i in range(len(barriers)):
-    write_text += f"{barriers[i].x},{barriers[i].y}" + ("\n" if i < len(barriers) - 1 else "")
-with open("../barrier.csv", "w") as f:
-    f.write(write_text)
-"""

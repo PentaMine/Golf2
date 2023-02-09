@@ -4,7 +4,7 @@ from random import randint
 
 from pathGeneration.Node import Node
 from pathGeneration.BoostPad import BoostPad
-from pathGeneration.dijkstra import findPath
+from pathGeneration.dijkstra import find_path
 import numpy as np
 
 
@@ -22,7 +22,7 @@ def generate_map_data(graph: list[list[str]]):
         nodes = generate_start_and_hole_pos()
         start = nodes[0]
         hole = nodes[1]
-        path = findPath(graph, start, hole)
+        path = find_path(graph, start, hole)
 
     graph[start.y][start.x] = "@"
     graph[hole.y][hole.x] = "X"
@@ -35,7 +35,7 @@ def generate_map_data(graph: list[list[str]]):
     graph[start.y][start.x] = "@"
     graph[hole.y][hole.x] = "X"
 
-    path = findPath(graph, start, hole)
+    path = find_path(graph, start, hole)
 
     draw_path(graph, path)
 
@@ -45,7 +45,7 @@ def generate_map_data(graph: list[list[str]]):
     graph[start.y][start.x] = "@"
     graph[hole.y][hole.x] = "X"
 
-    primary_path = findPath(graph, start, hole)
+    primary_path = find_path(graph, start, hole)
 
     graph[start.y][start.x] = "@"
     graph[hole.y][hole.x] = "X"
@@ -318,7 +318,7 @@ def make_forks(graph, path, hole, start):
 
     graph[start.y][start.x] = "@"
     graph[hole.y][hole.x] = "X"
-    found_path = findPath(graph, start, hole)
+    found_path = find_path(graph, start, hole)
 
     for i in path:
         found_path.append(i)

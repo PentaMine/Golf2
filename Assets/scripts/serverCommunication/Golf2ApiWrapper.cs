@@ -96,8 +96,9 @@ public class Golf2ApiWrapper
             var response = makeRequest("/verifyauth", HttpMethod.Get, SettingManager.settings.authToken);
             return response.code == HttpStatusCode.OK ? ApiResponse.OK : ApiResponse.UNAUTHENTICATED;
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            Debug.Log(e);
             return ApiResponse.NO_INTERNET;
         }
     }

@@ -7,8 +7,7 @@ using UnityEngine;
 
 public class Startup
 {
-    // run startup routine
-    [RuntimeInitializeOnLoadMethod]    
+    [InitializeOnLoadMethod]
     public static void OnStartup()
     {
         SettingManager.LoadSettings();

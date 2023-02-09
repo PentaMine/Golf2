@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Net.Security;
 using System.Threading;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MultiplayerMenuHandler : MonoBehaviour
 {
@@ -17,19 +19,23 @@ public class MultiplayerMenuHandler : MonoBehaviour
     private bool auth;
     private Golf2ApiWrapper api;
     private List<Golf2ApiWrapper.Session> sessions = new();
+    public GameObject loadingCanvasObject;
+    private Canvas loadingCanvas;
+    private bool isConnected = false;
+
     void Awake()
     {
         api = new Golf2ApiWrapper();
         usernameInput = usernameInputObject.GetComponent<TextMeshProUGUI>();
         errorMessageComponent = errorMessageObject.GetComponent<TextMeshProUGUI>();
         noAuthCanvas = noAuthCanvasObject.GetComponent<Canvas>();
-        auth = api.verifyAuth() == Golf2ApiWrapper.ApiResponse.OK;
-        noAuthCanvas.enabled = !auth;
-        Debug.Log(auth);
+        loadingCanvas = loadingCanvasObject.GetComponent<Canvas>();
         errorMessageComponent.text = "";
+
         new Thread(() => api.getAvailableSessions(out sessions)).Start();
+        new Thread(() => Authenticate()).Start();
     }
-    
+
     public void SubmitUsername()
     {
         Golf2ApiWrapper.ApiResponse response = api.authenticateClient(usernameInput.text);
@@ -42,11 +48,23 @@ public class MultiplayerMenuHandler : MonoBehaviour
                 errorMessageComponent.text = "NO INTERNET CONNECTION";
                 break;
         }
+
         noAuthCanvas.enabled = !auth;
+    }
+
+    private void Authenticate()
+    {
+        auth = api.verifyAuth() == Golf2ApiWrapper.ApiResponse.OK;
+        isConnected = true;
+        Debug.Log(api.verifyAuth());
     }
 
     private void FixedUpdate()
     {
-        Debug.Log(sessions.Count);
+        loadingCanvas.enabled = !isConnected;
+        if (sessions.Count > 0)
+        {
+            
+        }
     }
 }
