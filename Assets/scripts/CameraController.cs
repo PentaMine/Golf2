@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -34,7 +35,6 @@ public class CameraController : MonoBehaviour
         // this code moves the camera
         Vector2 mousePos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
         Vector2 mouseDelta = mousePos - prevPos;
-        cam.transform.localPosition = Vector3.Lerp(cam.transform.localPosition, new Vector3(0, 0, -distances[distanceIndex]), 0.02f);
 
         if (Input.GetMouseButtonDown(1))
         {
@@ -60,6 +60,11 @@ public class CameraController : MonoBehaviour
             int newIndex = distanceIndex + (int)Input.mouseScrollDelta.y;
             distanceIndex = isValidDistanceIndex(newIndex) ? newIndex : distanceIndex;
         }
+    }
+
+    private void FixedUpdate()
+    {
+        cam.transform.localPosition = Vector3.Lerp(cam.transform.localPosition, new Vector3(0, 0, -distances[distanceIndex]), 0.04f);
     }
 
     bool isValidDistanceIndex(int distanceInd)

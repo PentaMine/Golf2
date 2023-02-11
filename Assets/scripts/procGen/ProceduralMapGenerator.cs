@@ -71,7 +71,7 @@ public class ProceduralMapGenerator : MonoBehaviour
 
             Vector2 delta = boostPadPos - end;
 
-            // create boost pad and rotate it to face the hole, but round the rotation the the neerest multiple of 45
+            // create boost pad and rotate it to face the hole, but round the rotation the the nearest multiple of 45
             Instantiate(boostPadPrefab, (new Vector3(boostPadPos.x, 0, boostPadPos.y) - endV3) * 10, Quaternion.Euler(new Vector3(0,
                 MathUtil.RoundToMultiple(MathUtil.radiansToDegrees(Mathf.Atan2(delta.x, delta.y)), 45), 0)));
         }
@@ -82,11 +82,11 @@ public class ProceduralMapGenerator : MonoBehaviour
     List<Vector2> GetVectorsFromCsv(List<string> contents)
     {
         List<Vector2> path = new List<Vector2>();
-        // remove coulumb ids
+        // remove coulomb ids
         contents.RemoveAt(0);
         foreach (string line in contents)
         {
-            // seperate two values 
+            // separate two values 
             string[] xy = line.Split(",");
             path.Add(new Vector2(Int16.Parse(xy[0]), Int16.Parse(xy[1])));
         }
@@ -98,7 +98,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     {
         string command = "python.exe ../procGen/";
         string arguments = "/B";
-
+        
         Process process = new Process();
 
         process.StartInfo.FileName = "cmd.exe";

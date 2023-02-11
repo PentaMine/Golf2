@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1480,6 +1480,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   isPaused: 0
+  isMultiplayer: 0
 --- !u!4 &1358247726
 Transform:
   m_ObjectHideFlags: 0
@@ -1624,9 +1625,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   EngPrefix: 
-  EngSuffix: 
+  EngSuffix: s
   CroPrefix: 
-  CroSuffix: 
+  CroSuffix: s
 --- !u!114 &1457215907
 MonoBehaviour:
   m_ObjectHideFlags: 0
