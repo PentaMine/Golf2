@@ -19,7 +19,7 @@ public class MainMenuButtonHandler : MonoBehaviour
 
     public void Exit()
     {
-        SettingManager.SaveSettings();
+        Main.OnShutdown();
         Application.Quit();
     }
 

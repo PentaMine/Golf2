@@ -22,6 +22,9 @@ public class MultiplayerMenuHandler : MonoBehaviour
     public GameObject loadingCanvasObject;
     private Canvas loadingCanvas;
     private bool isConnected = false;
+    private bool areSessionsLoaded = false;
+    public GameObject sessionInfoContent;
+    public GameObject sessionButtonPrefab;
 
     void Awake()
     {
@@ -62,9 +65,16 @@ public class MultiplayerMenuHandler : MonoBehaviour
     private void FixedUpdate()
     {
         loadingCanvas.enabled = !isConnected;
-        if (sessions.Count > 0)
+        noAuthCanvas.enabled = !auth;
+        if (sessions.Count > 0 && !areSessionsLoaded)
         {
-            
+            Debug.Log(sessions.Count);
+            foreach (Golf2ApiWrapper.Session session in sessions)
+            {
+                Debug.Log(session);
+                Instantiate(sessionButtonPrefab, Vector3.zero, Quaternion.Euler(Vector3.zero), sessionInfoContent.transform).GetComponent<SessionButtonController>().SetData(session.owner, session.participants, session.id);
+            }
+            areSessionsLoaded = true;
         }
     }
 }
