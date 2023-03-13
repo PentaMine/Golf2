@@ -16,7 +16,7 @@ public class Main
 
     public static void OnShutdown()
     {
-        new Golf2ApiWrapper().leaveSession();
+        new Golf2Api().leaveSession();
         SettingManager.SaveSettings();
     }
 }

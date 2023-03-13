@@ -19,9 +19,15 @@ public class SettingManager
         public int port;
         public string authToken;
 
-        public string getFullUri(string path)
+        public string getFullHTTPUri(string path)
         {
-            return server + ":" + port + path;
+            return $"http://{server}:{port}{path}";
+        }
+
+
+        public string getWebSocketUri()
+        {
+            return $"ws://{server}:{port}";
         }
     }
 

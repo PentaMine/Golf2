@@ -20,7 +20,7 @@ public class SessionButtonController : MonoBehaviour
         participantList = participantListObject.GetComponent<TextMeshProUGUI>();
         gameObject.GetComponent<Button>().onClick.AddListener(() =>
         {
-            Debug.Log(new Golf2ApiWrapper().joinSession(id, out string token));
+            Debug.Log(new Golf2Api().joinSession(id, out string token));
             Debug.Log(token);
         });
     }
