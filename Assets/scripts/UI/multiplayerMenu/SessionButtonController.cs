@@ -1,9 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class SessionButtonController : MonoBehaviour
 {
@@ -22,6 +21,8 @@ public class SessionButtonController : MonoBehaviour
         {
             Debug.Log(new Golf2Api().joinSession(id, out string token));
             Debug.Log(token);
+            Main.socketArg = token;
+            SceneManager.LoadScene("SessionMenu");
         });
     }
 

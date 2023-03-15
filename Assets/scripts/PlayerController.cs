@@ -1,13 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     // Start is called before the first frame update
-    public float speed;
     public Rigidbody rb;
-    public GameObject cam;
     public GameObject player;
     public GameObject launchIndicator;
     public MeshRenderer indicatorRenderer;
@@ -27,9 +24,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        speed = 10;
         rb = GetComponent<Rigidbody>();
-        cam = Camera.main.gameObject;
         player = GameObject.FindGameObjectWithTag("Player");
         launchIndicator = GameObject.FindGameObjectWithTag("LaunchIndicator");
         indicatorRenderer = launchIndicator.GetComponent<MeshRenderer>();

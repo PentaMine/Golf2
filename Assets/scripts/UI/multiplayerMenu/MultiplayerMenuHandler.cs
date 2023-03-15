@@ -1,11 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
-using System;
-using System.Net.Security;
 using System.Threading;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class MultiplayerMenuHandler : MonoBehaviour
 {
@@ -81,6 +77,7 @@ public class MultiplayerMenuHandler : MonoBehaviour
     public void CreateSessionButton()
     {
         api.createSession(out string socketToken);
+        
         Debug.Log(socketToken);
     }
 }

@@ -1,13 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
-using UnityEditor;
 using UnityEngine;
 
 
 
 public class Main
 {
+    public static string socketArg;
+    
     [RuntimeInitializeOnLoadMethod]
     public static void OnStartup()
     {

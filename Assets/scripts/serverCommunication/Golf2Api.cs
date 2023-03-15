@@ -1,14 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -21,7 +16,7 @@ public class Golf2Api
         NO_INTERNET,
         USERNAME_TAKEN,
         UNAUTHORISED,
-        CONFLICT
+        NOT_IN_SESSION
     }
 
     private class Response
@@ -92,7 +87,7 @@ public class Golf2Api
 
     private Response makeRequest(string path, HttpMethod method, string authToken = "", string body = "")
     {
-        Debug.Log(SettingManager.settings.getFullHTTPUri(path));
+        //Debug.Log(SettingManager.settings.getFullHTTPUri(path));
         var client = new HttpClient();
         var request = new HttpRequestMessage
         {
@@ -217,9 +212,9 @@ public class Golf2Api
         {
             Response response = makeRequest("/leavesession", HttpMethod.Post, authToken: SettingManager.settings.authToken);
             
-            if (response.code == HttpStatusCode.Conflict)
+            if (response.code == HttpStatusCode.BadRequest)
             {
-                return ApiResponse.CONFLICT;
+                return ApiResponse.NOT_IN_SESSION;
             }
 
             return ApiResponse.OK;

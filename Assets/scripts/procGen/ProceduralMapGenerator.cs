@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 using System.Linq;
-using Debug = UnityEngine.Debug;
 
 public class ProceduralMapGenerator : MonoBehaviour
 {
