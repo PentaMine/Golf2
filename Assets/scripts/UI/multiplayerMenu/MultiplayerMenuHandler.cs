@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MultiplayerMenuHandler : MonoBehaviour
 {
@@ -67,7 +68,6 @@ public class MultiplayerMenuHandler : MonoBehaviour
             Debug.Log(sessions.Count);
             foreach (Golf2Api.Session session in sessions)
             {
-                Debug.Log(session);
                 Instantiate(sessionButtonPrefab, Vector3.zero, Quaternion.Euler(Vector3.zero), sessionInfoContent.transform).GetComponent<SessionButtonController>().SetData(session.owner, session.participants, session.id);
             }
             areSessionsLoaded = true;
@@ -76,8 +76,9 @@ public class MultiplayerMenuHandler : MonoBehaviour
 
     public void CreateSessionButton()
     {
-        api.createSession(out string socketToken);
-        
-        Debug.Log(socketToken);
+        api.createSession(out string socketArg);
+        Main.socketArg = socketArg;
+        Debug.Log(socketArg);
+        SceneManager.LoadScene("SessionMenu");
     }
 }

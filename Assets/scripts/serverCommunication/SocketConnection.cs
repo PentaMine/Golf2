@@ -3,12 +3,14 @@ using UnityEngine;
 
 public class SocketConnection : MonoBehaviour
 {
-    // Start is called before the first frame update
-    private Golf2Socket webSocket;
+    public Golf2Socket webSocket;
     private bool initAttempted = false;
+    private float timePassed;
+    public static SocketConnection instance;
     void Start()
     {
-        webSocket = new Golf2Socket("Main.socketArg");
+        instance = this;
+        webSocket = new Golf2Socket(Main.socketArg);
     }
 
     void Update()
@@ -16,8 +18,12 @@ public class SocketConnection : MonoBehaviour
         if (webSocket.websocket.State == WebSocketState.Open && !initAttempted)
         {
             initAttempted = true;
-            Debug.Log("rewr");
             webSocket.SendSocketArg();
+        }
+
+        if ((!webSocket.isAuthorisedToSession || webSocket.websocket.State != WebSocketState.Open) && timePassed > 5)
+        {
+            Debug.Log("failed to connect");
         }
         
         
