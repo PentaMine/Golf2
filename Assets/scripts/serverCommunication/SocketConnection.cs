@@ -7,6 +7,7 @@ public class SocketConnection : MonoBehaviour
     private bool initAttempted = false;
     private float timePassed;
     public static SocketConnection instance;
+
     void Start()
     {
         instance = this;
@@ -25,8 +26,8 @@ public class SocketConnection : MonoBehaviour
         {
             Debug.Log("failed to connect");
         }
-        
-        
+
+
 #if !UNITY_WEBGL || UNITY_EDITOR
         webSocket.websocket.DispatchMessageQueue();
 #endif
@@ -34,6 +35,7 @@ public class SocketConnection : MonoBehaviour
 
     private async void OnApplicationQuit()
     {
-        await webSocket.websocket.Close();
+        webSocket.Disconnect();
+        new Golf2Api().leaveSession();
     }
 }

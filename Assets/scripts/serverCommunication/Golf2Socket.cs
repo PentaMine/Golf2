@@ -32,7 +32,8 @@ public class Golf2Socket
     // outgoing events
     private enum OutEventType
     {
-        HANDSHAKE = 0
+        HANDSHAKE = 0,
+        DISCONNECT = 1
     }
 
     // incoming events
@@ -123,9 +124,9 @@ public class Golf2Socket
         OnSync.Invoke(new SyncData(message.content.owner, message.content.participants));
     }
     
-    private string ComposeMessage(OutEventType type, object content)
+    private string ComposeMessage(OutEventType type, object content = null)
     {
-        return JsonConvert.SerializeObject(new {type = type, content });
+        return JsonConvert.SerializeObject(new { type, content });
     }
 
     public void SendSocketArg()
@@ -138,5 +139,10 @@ public class Golf2Socket
         string message = ComposeMessage(OutEventType.HANDSHAKE, new { socketArg });
         Debug.Log(message);
         websocket.SendText(message);
+    }
+
+    public void Disconnect()
+    {
+        websocket.SendText(ComposeMessage(OutEventType.DISCONNECT));
     }
 }
