@@ -33,7 +33,7 @@ public class SocketConnection : MonoBehaviour
 #endif
     }
 
-    private async void OnApplicationQuit()
+    private void OnApplicationQuit()
     {
         webSocket.Disconnect();
         new Golf2Api().leaveSession();

@@ -22,6 +22,7 @@ public class SessionButtonController : MonoBehaviour
             Debug.Log(new Golf2Api().joinSession(id, out string token));
             Debug.Log(token);
             Main.socketArg = token;
+            Main.isSessionOwner = false;
             SceneManager.LoadScene("SessionMenu");
         });
     }

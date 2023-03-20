@@ -78,6 +78,7 @@ public class MultiplayerMenuHandler : MonoBehaviour
     {
         api.createSession(out string socketArg);
         Main.socketArg = socketArg;
+        Main.isSessionOwner = true;
         Debug.Log(socketArg);
         SceneManager.LoadScene("SessionMenu");
     }

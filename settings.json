@@ -1,1 +1,7 @@
-{"server":"localhost","port":2999,"authToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoyNywiaWF0IjoxNjc1MzU2MDI3fQ.SCEIEQCeg6-WwSU8H_qCgIO708nyc3fsseX4ZpIpma0","lang":"ENGLISH"}
+{
+  "server": "localhost",
+  "port": 2999,
+  "authToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoyNywiaWF0IjoxNjc1MzU2MDI3fQ.SCEIEQCeg6-WwSU8H_qCgIO708nyc3fsseX4ZpIpma0",
+  "name": "unity11",
+  "lang": "ENGLISH"
+}

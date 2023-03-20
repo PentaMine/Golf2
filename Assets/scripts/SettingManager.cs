@@ -18,6 +18,7 @@ public class SettingManager
         public string server;
         public int port;
         public string authToken;
+        public string name;
 
         public string getFullHTTPUri(string path)
         {

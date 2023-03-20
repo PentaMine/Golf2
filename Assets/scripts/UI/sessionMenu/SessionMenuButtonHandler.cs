@@ -12,4 +12,14 @@ public class SessionMenuButtonHandler : MonoBehaviour
         new Golf2Api().leaveSession();
         SceneManager.LoadScene("MultiplayerMenu");
     }
+
+    public void Ready()
+    {
+        SocketConnection.instance.webSocket.SetReady();
+    }
+    
+    public void Unready()
+    {
+        SocketConnection.instance.webSocket.SetReady();
+    }
 }

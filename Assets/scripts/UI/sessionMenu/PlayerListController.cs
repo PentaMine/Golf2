@@ -13,17 +13,17 @@ public class PlayerListController : MonoBehaviour
     {
         owner = ownerObject.GetComponent<TextMeshProUGUI>();
         participants = participantsObject.GetComponent<TextMeshProUGUI>();
-        Golf2Socket.OnSync += UpdateText;
+        Golf2Socket.OnPlayerSync += UpdateText;
     }
 
     // Update is called once per frame
     void UpdateText(Golf2Socket.SyncData data)
     {
-        owner.text = data.owner;
+        owner.text = data.owner + (data.ready.Contains(data.owner) ? " (ready)" : "");
         string participantsText = "";
         foreach (var participant in data.participants)
         {
-            participantsText += participant + "\n";
+            participantsText += participant + (data.ready.Contains(participant) ? " (ready)" : "") + "\n";
         }
 
         participants.text = participantsText;

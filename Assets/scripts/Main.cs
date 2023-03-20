@@ -5,6 +5,7 @@ using UnityEngine;
 public class Main
 {
     public static string socketArg;
+    public static bool isSessionOwner;
     
     [RuntimeInitializeOnLoadMethod]
     public static void OnStartup()

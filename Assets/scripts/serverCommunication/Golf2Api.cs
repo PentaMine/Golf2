@@ -130,6 +130,7 @@ public class Golf2Api
             if (response.code == HttpStatusCode.OK)
             {
                 SettingManager.settings.authToken = JsonConvert.DeserializeObject<ClientAuthResponse>(response.body).response.token;
+                SettingManager.settings.name = name;
                 SettingManager.SaveSettings();
                 Debug.Log(response.body);
                 return ApiResponse.OK;
