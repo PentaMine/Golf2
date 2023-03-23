@@ -13,15 +13,18 @@ public class MultiplayerMenuHandler : MonoBehaviour
     private TextMeshProUGUI errorMessageComponent;
     public GameObject noAuthCanvasObject;
     private Canvas noAuthCanvas;
+    public GameObject noInternetCanvasObject;
+    private Canvas noInternetCanvas;
     private bool auth;
     private Golf2Api api;
     private List<Golf2Api.Session> sessions = new();
     public GameObject loadingCanvasObject;
     private Canvas loadingCanvas;
-    private bool isConnected = false;
+    private bool isConnectionAttempted = false;
     private bool areSessionsLoaded = false;
     public GameObject sessionInfoContent;
     public GameObject sessionButtonPrefab;
+    private bool isNoInternet = false;
 
     void Awake()
     {
@@ -30,6 +33,7 @@ public class MultiplayerMenuHandler : MonoBehaviour
         errorMessageComponent = errorMessageObject.GetComponent<TextMeshProUGUI>();
         noAuthCanvas = noAuthCanvasObject.GetComponent<Canvas>();
         loadingCanvas = loadingCanvasObject.GetComponent<Canvas>();
+        noInternetCanvas = noInternetCanvasObject.GetComponent<Canvas>();
         errorMessageComponent.text = "";
 
         new Thread(() => api.getAvailableSessions(out sessions)).Start();
@@ -54,15 +58,19 @@ public class MultiplayerMenuHandler : MonoBehaviour
 
     private void Authenticate()
     {
-        auth = api.verifyAuth() == Golf2Api.ApiResponse.OK;
-        isConnected = true;
+        Golf2Api.ApiResponse verification = api.verifyAuth();
+        auth = verification == Golf2Api.ApiResponse.OK;
+        isNoInternet = verification == Golf2Api.ApiResponse.NO_INTERNET;
+        isConnectionAttempted = true;
+        Debug.Log(isNoInternet);
         Debug.Log(api.verifyAuth());
     }
 
     private void FixedUpdate()
     {
-        loadingCanvas.enabled = !isConnected;
+        loadingCanvas.enabled = !isConnectionAttempted;
         noAuthCanvas.enabled = !auth;
+        noInternetCanvas.enabled = isNoInternet;
         if (sessions.Count > 0 && !areSessionsLoaded)
         {
             Debug.Log(sessions.Count);
@@ -77,8 +85,8 @@ public class MultiplayerMenuHandler : MonoBehaviour
     public void CreateSessionButton()
     {
         api.createSession(out string socketArg);
-        Main.socketArg = socketArg;
-        Main.isSessionOwner = true;
+        SocketData.socketArg = socketArg;
+        SocketData.isSessionOwner = true;
         Debug.Log(socketArg);
         SceneManager.LoadScene("SessionMenu");
     }

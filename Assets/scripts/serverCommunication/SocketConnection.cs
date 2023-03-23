@@ -1,9 +1,10 @@
-﻿using NativeWebSocket;
+﻿using System.Threading;
+using NativeWebSocket;
 using UnityEngine;
 
 public class SocketConnection : MonoBehaviour
 {
-    public Golf2Socket webSocket;
+    public Golf2Socket socketManager;
     private bool initAttempted = false;
     private float timePassed;
     public static SocketConnection instance;
@@ -11,31 +12,25 @@ public class SocketConnection : MonoBehaviour
     void Start()
     {
         instance = this;
-        webSocket = new Golf2Socket(Main.socketArg);
+        socketManager = new Golf2Socket(SocketData.socketArg);
     }
 
     void Update()
     {
-        if (webSocket.websocket.State == WebSocketState.Open && !initAttempted)
+        if (socketManager.websocket.State == WebSocketState.Open && !initAttempted)
         {
             initAttempted = true;
-            webSocket.SendSocketArg();
+            socketManager.SendSocketArg();
         }
-
-        if ((!webSocket.isAuthorisedToSession || webSocket.websocket.State != WebSocketState.Open) && timePassed > 5)
-        {
-            Debug.Log("failed to connect");
-        }
-
 
 #if !UNITY_WEBGL || UNITY_EDITOR
-        webSocket.websocket.DispatchMessageQueue();
+        socketManager.websocket.DispatchMessageQueue();
 #endif
     }
 
     private void OnApplicationQuit()
     {
-        webSocket.Disconnect();
+        socketManager.Disconnect();
         new Golf2Api().leaveSession();
     }
 }

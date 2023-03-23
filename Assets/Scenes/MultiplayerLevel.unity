@@ -2848,6 +2848,7 @@ MonoBehaviour:
   playerPrefab: {fileID: 4942567601416677043, guid: 3be69bc69bae8034b87323b3c11e5ba8, type: 3}
   boostPadPrefab: {fileID: 807610258762776425, guid: 28e94e9abbfe00b4b862fda2071182cf, type: 3}
   wallPrefab: {fileID: 257613135496124478, guid: e4b1e6780f8ee6f4e920ae727181a556, type: 3}
+  isOnline: 1
 --- !u!114 &2130678186
 MonoBehaviour:
   m_ObjectHideFlags: 0

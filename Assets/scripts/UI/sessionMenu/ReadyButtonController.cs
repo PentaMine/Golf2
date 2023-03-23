@@ -30,13 +30,13 @@ public class ReadyButtonController : MonoBehaviour
         {
             //textComponent.text = "UNREADY";
             // send to server asynchronously
-            new Thread(SocketConnection.instance.webSocket.SetReady).Start();
+            new Thread(SocketConnection.instance.socketManager.SetReady).Start();
         }
         else
         {
             //textComponent.text = "READY";
             // send to server asynchronously
-            new Thread(SocketConnection.instance.webSocket.SetUnready).Start();
+            new Thread(SocketConnection.instance.socketManager.SetUnready).Start();
         }
     }
 

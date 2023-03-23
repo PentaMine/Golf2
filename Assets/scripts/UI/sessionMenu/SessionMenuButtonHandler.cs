@@ -8,18 +8,18 @@ public class SessionMenuButtonHandler : MonoBehaviour
 {
     public void Leave()
     {
-        SocketConnection.instance.webSocket.Disconnect();
+        SocketConnection.instance.socketManager.Disconnect();
         new Golf2Api().leaveSession();
         SceneManager.LoadScene("MultiplayerMenu");
     }
 
     public void Ready()
     {
-        SocketConnection.instance.webSocket.SetReady();
+        SocketConnection.instance.socketManager.SetReady();
     }
     
     public void Unready()
     {
-        SocketConnection.instance.webSocket.SetReady();
+        SocketConnection.instance.socketManager.SetReady();
     }
 }

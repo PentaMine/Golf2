@@ -12,6 +12,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     public GameObject playerPrefab;
     public GameObject boostPadPrefab;
     public GameObject wallPrefab;
+    public bool isOnline;
     
     public class MapData
     {
@@ -19,7 +20,7 @@ public class ProceduralMapGenerator : MonoBehaviour
         public List<Vector2> boostPads;
         public Vector2 start;
         public Vector2 end;
-
+        
         public MapData(List<Vector2> path, List<Vector2> boostPads)
         {
             this.path = path;
@@ -30,22 +31,9 @@ public class ProceduralMapGenerator : MonoBehaviour
     }
 
     void Awake()
-    {/*
-        RunPathGeneration();
-        string pathCsv = "./path.csv";
-        string boostCsv = "./boost.csv";
-        // get coords of every node along the path
-        List<string> csvPath = new List<string>(File.ReadAllText(pathCsv).Split("\n"));
-        List<Vector2> path = GetVectorsFromCsv(csvPath);
-        // get boost pad positions
-        List<string> csvBoost = new List<string>(File.ReadAllText(boostCsv).Split("\n"));
-        List<Vector2> boostPads = GetVectorsFromCsv(csvBoost);
-
-        Vector2 start = path.Last();
-        Vector2 end = path[0];*/
-
-        MapData mapData = GetMapData();
-        
+    {
+        MapData mapData;
+        mapData = isOnline ? SessionData.mapData : GetMapData();
 
         Vector3 endV3 = new Vector3(mapData.end.x, 0, mapData.end.y);
         // set what neighbours to check when creating a edge path

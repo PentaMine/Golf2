@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class GameManager : MonoBehaviour
 {
@@ -8,7 +9,6 @@ public class GameManager : MonoBehaviour
     private float gameDuration;
     private Canvas pauseScreen;
     public bool isPaused;
-    public bool isMultiplayer;
 
     public enum GameState
     {
@@ -45,7 +45,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if ((!isPaused || isMultiplayer) && state != GameState.START)
+        if (!isPaused && state != GameState.START)
         {
             gameDuration += Time.deltaTime;
         }
@@ -88,7 +88,7 @@ public class GameManager : MonoBehaviour
     private void Pause()
     {
         // stop time
-        Time.timeScale = isMultiplayer ? 1f : 0f;
+        Time.timeScale = 0f;
     }
 
     private void OnDestroy()

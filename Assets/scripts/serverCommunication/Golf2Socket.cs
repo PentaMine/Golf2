@@ -4,6 +4,7 @@ using UnityEngine;
 using NativeWebSocket;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using UnityEngine.PlayerLoop;
 using UnityEngine.UIElements;
 
 //using WebSocketSharp;
@@ -15,6 +16,10 @@ public class Golf2Socket
     public bool isAuthorisedToSession;
     private bool isMapSent;
 
+    public delegate void SocketConnectEvent();
+
+    public static event SocketConnectEvent OnSocketConnect;
+
     public delegate void SyncEvent(SyncData data);
 
     public static event SyncEvent OnPlayerSync;
@@ -22,6 +27,18 @@ public class Golf2Socket
     public delegate void MapSyncEvent(ProceduralMapGenerator.MapData data);
 
     public static event MapSyncEvent OnMapSync;
+
+    public delegate void SessionCountdownEvent(int timeRemaining);
+
+    public static event SessionCountdownEvent OnSessionCountdown;
+
+    public delegate void SessionBeginEvent();
+
+    public static event SessionBeginEvent OnSessionBegin;
+
+    public delegate void PosSyncEvent(float x, float y);
+
+    public static event PosSyncEvent OnPosSync;
 
     public class SyncData
     {
@@ -43,7 +60,8 @@ public class Golf2Socket
         HANDSHAKE = 0,
         DISCONNECT = 1,
         SET_READY = 2,
-        SET_UNREADY = 3
+        SET_UNREADY = 3,
+        POS_SYNC = 4
     }
 
     // incoming events
@@ -52,13 +70,37 @@ public class Golf2Socket
         HANDSHAKE_ACK = 0,
         HANDSHAKE_NAK = 1,
         SYNCHRONISE = 2,
-        MAP_SYNC = 3
+        MAP_SYNC = 3,
+        SESSION_COUNTDOWN = 4,
+        POS_SYNC = 5
     }
 
     private class Message
     {
         public int type;
         public object content;
+    }
+
+    private class PosSyncMessage
+    {
+        public int type;
+        public Content content;
+
+        public class Content
+        {
+            public float x, y;
+        }
+    }
+
+    private class SessionCountdownMessage
+    {
+        public int type;
+        public Content content;
+
+        public class Content
+        {
+            public int time;
+        }
     }
 
     private class SyncMessage
@@ -74,14 +116,14 @@ public class Golf2Socket
         }
     }
 
-    private class MapDataMessage
+    private class MapData
     {
         public List<Vec2> path;
         public List<Vec2> boostPads;
         public Vec2 start;
         public Vec2 end;
 
-        public MapDataMessage(List<Vec2> path, List<Vec2> boostPads, Vec2 start, Vec2 end)
+        public MapData(List<Vec2> path, List<Vec2> boostPads, Vec2 start, Vec2 end)
         {
             this.path = path;
             this.boostPads = boostPads;
@@ -105,6 +147,17 @@ public class Golf2Socket
             }
         }
     }
+    
+    private class MapDataMessage
+    {
+        public int type;
+        public Content content;
+
+        public class Content
+        {
+            public MapData mapData;
+        } 
+    }
 
     public Golf2Socket(string socketArg)
     {
@@ -126,6 +179,7 @@ public class Golf2Socket
 
     private void OnSocketOpen()
     {
+        if (OnSocketConnect != null) OnSocketConnect();
         Debug.Log("Connection open");
     }
 
@@ -162,35 +216,51 @@ public class Golf2Socket
             case (int)InEventType.MAP_SYNC:
                 HandleMapSync(messageText);
                 break;
+            case (int)InEventType.SESSION_COUNTDOWN:
+                HandleSessionCountdown(messageText);
+                break;
+            case (int)InEventType.POS_SYNC:
+                HandlePosSync(messageText);
+                break;
         }
+    }
+
+    private void HandlePosSync(string messageText)
+    {
+        PosSyncMessage message = JsonConvert.DeserializeObject<PosSyncMessage>(messageText);
+
+        if (OnPosSync != null) OnPosSync(message.content.x, message.content.y);
+    }
+
+    private void HandleSessionCountdown(string messageText)
+    {
+        SessionCountdownMessage message = JsonConvert.DeserializeObject<SessionCountdownMessage>(messageText);
+
+        if (OnSessionCountdown != null) OnSessionCountdown(message.content.time);
+        if (OnSessionBegin != null && message.content.time == 0) OnSessionBegin();
     }
 
     private void HandleMapSync(string messageText)
     {
         MapDataMessage message = JsonConvert.DeserializeObject<MapDataMessage>(messageText);
-
-        if (OnMapSync == null)
-        {
-            return;
-        }
-
+        Debug.LogWarning(message.type);
+        Debug.LogWarning(message.content.mapData.end);
+        Debug.LogWarning(messageText);
         // invoke map sync event
-        OnMapSync(new ProceduralMapGenerator.MapData(
-            DesimplifyVectors(message.path),
-            DesimplifyVectors(message.boostPads)
-        ));
+        if (OnMapSync != null)
+        {
+            OnMapSync(new ProceduralMapGenerator.MapData(
+                DesimplifyVectors(message.content.mapData.path),
+                DesimplifyVectors(message.content.mapData.boostPads)
+            ));
+        }
     }
 
     private void HandleSync(string messageText)
     {
         SyncMessage message = JsonConvert.DeserializeObject<SyncMessage>(messageText);
-        if (OnPlayerSync == null)
-        {
-            return;
-        }
-
         // invoke sync event.
-        OnPlayerSync.Invoke(new SyncData(message.content.owner, message.content.participants, message.content.ready));
+        if (OnPlayerSync != null) OnPlayerSync.Invoke(new SyncData(message.content.owner, message.content.participants, message.content.ready));
     }
 
     private string ComposeMessage(OutEventType type, object content = null)
@@ -198,9 +268,9 @@ public class Golf2Socket
         return JsonConvert.SerializeObject(new { type, content });
     }
 
-    private List<MapDataMessage.Vec2> SimplifyVectors(List<Vector2> vectors)
+    private List<MapData.Vec2> SimplifyVectors(List<Vector2> vectors)
     {
-        List<MapDataMessage.Vec2> simpleVectors = new List<MapDataMessage.Vec2>();
+        List<MapData.Vec2> simpleVectors = new List<MapData.Vec2>();
         foreach (var vector in vectors)
         {
             simpleVectors.Add(SimplifyVector(vector));
@@ -209,12 +279,12 @@ public class Golf2Socket
         return simpleVectors;
     }
 
-    private MapDataMessage.Vec2 SimplifyVector(Vector2 vector)
+    private MapData.Vec2 SimplifyVector(Vector2 vector)
     {
-        return new MapDataMessage.Vec2(vector.x, vector.y);
+        return new MapData.Vec2(vector.x, vector.y);
     }
 
-    private List<Vector2> DesimplifyVectors(List<MapDataMessage.Vec2> vectors)
+    private List<Vector2> DesimplifyVectors(List<MapData.Vec2> vectors)
     {
         List<Vector2> simpleVectors = new List<Vector2>();
         foreach (var vector in vectors)
@@ -246,12 +316,12 @@ public class Golf2Socket
     public void SetReady()
     {
         Debug.Log("ready");
-        if (!Main.isSessionOwner)
+        if (!SocketData.isSessionOwner)
         {
             websocket.SendText(ComposeMessage(OutEventType.SET_READY));
             return;
         }
-        
+
         // don't waste resources if the map has already been generated
         if (isMapSent)
         {
@@ -262,19 +332,24 @@ public class Golf2Socket
         // simplification of vectors is necessary because JsonConvert does not play well with the builtin Vector2 class
         // with lots of attributes, so we need to reduce the vectors to only x and y values  
         ProceduralMapGenerator.MapData mapData = ProceduralMapGenerator.GetMapData();
-        MapDataMessage message = new MapDataMessage(
+        MapData message = new MapData(
             SimplifyVectors(mapData.path),
             SimplifyVectors(mapData.boostPads),
             SimplifyVector(mapData.start),
             SimplifyVector(mapData.end)
         );
 
-        websocket.SendText(ComposeMessage(OutEventType.SET_READY, JsonConvert.SerializeObject(new { mapData = message })));
+        websocket.SendText(ComposeMessage(OutEventType.SET_READY, new { mapData = message }));
         isMapSent = true;
     }
 
     public void SetUnready()
     {
         websocket.SendText(ComposeMessage(OutEventType.SET_UNREADY));
+    }
+
+    public void UpdatePos(float x, float y)
+    {
+        websocket.SendText(ComposeMessage(OutEventType.POS_SYNC, new { x, y }));
     }
 }
