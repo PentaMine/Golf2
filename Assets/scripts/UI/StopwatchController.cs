@@ -11,12 +11,13 @@ public class StopwatchController : MonoBehaviour
     private void Start()
     {
         txtComp = GetComponent<TextMeshProUGUI>();
+        gameManager = GameManager.instance;
     }
 
     void Update()
     {
         txtComp.text = (SettingManager.settings.lang == SettingManager.Language.ENGLISH ? EngPrefix : CroPrefix)
-                       + GameManager.instance.GetGameDuration().ToString("0.00")
+                       + gameManager.GetGameDuration().ToString("0.00")
                        + (SettingManager.settings.lang == SettingManager.Language.ENGLISH ? EngSuffix : CroSuffix);
     }
 }

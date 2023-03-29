@@ -14,6 +14,7 @@ public class Golf2Socket
     public WebSocket websocket;
     private string socketArg;
     public bool isAuthorisedToSession;
+    public List<string> participants;
     private bool isMapSent;
 
     public delegate void SocketConnectEvent();
@@ -36,9 +37,13 @@ public class Golf2Socket
 
     public static event SessionBeginEvent OnSessionBegin;
 
-    public delegate void PosSyncEvent(float x, float y);
+    public delegate void PosSyncEvent(string user, Vector3 pos, Vector3 velocity);
 
     public static event PosSyncEvent OnPosSync;
+    
+    public delegate void EndOfSessionEvent();
+
+    public static event EndOfSessionEvent OnSessionEnd;
 
     public class SyncData
     {
@@ -72,7 +77,8 @@ public class Golf2Socket
         SYNCHRONISE = 2,
         MAP_SYNC = 3,
         SESSION_COUNTDOWN = 4,
-        POS_SYNC = 5
+        POS_SYNC = 5,
+        END_OF_SESSION = 6
     }
 
     private class Message
@@ -88,7 +94,9 @@ public class Golf2Socket
 
         public class Content
         {
-            public float x, y;
+            public string user;
+            public float px, py, pz; // position
+            public float vx, vz; // velocity
         }
     }
 
@@ -143,11 +151,11 @@ public class Golf2Socket
 
             public Vector2 ToVector2()
             {
-                return new Vector2(this.x, this.y);
+                return new Vector2(x, y);
             }
         }
     }
-    
+
     private class MapDataMessage
     {
         public int type;
@@ -156,7 +164,7 @@ public class Golf2Socket
         public class Content
         {
             public MapData mapData;
-        } 
+        }
     }
 
     public Golf2Socket(string socketArg)
@@ -222,14 +230,34 @@ public class Golf2Socket
             case (int)InEventType.POS_SYNC:
                 HandlePosSync(messageText);
                 break;
+            case (int)InEventType.END_OF_SESSION:
+                HandleEndOfSession();
+                break;
         }
+    }
+
+    private void HandleEndOfSession()
+    {
+        if (OnSessionEnd != null) OnSessionEnd();
     }
 
     private void HandlePosSync(string messageText)
     {
         PosSyncMessage message = JsonConvert.DeserializeObject<PosSyncMessage>(messageText);
 
-        if (OnPosSync != null) OnPosSync(message.content.x, message.content.y);
+        if (OnPosSync != null)
+            OnPosSync(
+                message.content.user,
+                new Vector3(
+                    message.content.px,
+                    message.content.py,
+                    message.content.pz
+                ),
+                new Vector3(
+                    message.content.vx,
+                    0,
+                    message.content.vz
+                ));
     }
 
     private void HandleSessionCountdown(string messageText)
@@ -243,9 +271,6 @@ public class Golf2Socket
     private void HandleMapSync(string messageText)
     {
         MapDataMessage message = JsonConvert.DeserializeObject<MapDataMessage>(messageText);
-        Debug.LogWarning(message.type);
-        Debug.LogWarning(message.content.mapData.end);
-        Debug.LogWarning(messageText);
         // invoke map sync event
         if (OnMapSync != null)
         {
@@ -261,6 +286,11 @@ public class Golf2Socket
         SyncMessage message = JsonConvert.DeserializeObject<SyncMessage>(messageText);
         // invoke sync event.
         if (OnPlayerSync != null) OnPlayerSync.Invoke(new SyncData(message.content.owner, message.content.participants, message.content.ready));
+
+        List<string> newParticipants = new List<string>(message.content.participants);
+        newParticipants.Add(message.content.owner);
+
+        participants = newParticipants;
     }
 
     private string ComposeMessage(OutEventType type, object content = null)
@@ -348,8 +378,15 @@ public class Golf2Socket
         websocket.SendText(ComposeMessage(OutEventType.SET_UNREADY));
     }
 
-    public void UpdatePos(float x, float y)
+    public void UpdatePos(Vector3 pos, Vector3 velocity)
     {
-        websocket.SendText(ComposeMessage(OutEventType.POS_SYNC, new { x, y }));
+        double px = Math.Round(pos.x, 2);
+        double py = Math.Round(pos.y, 2);
+        double pz = Math.Round(pos.z, 2);        
+        
+        double vx = Math.Round(velocity.x, 3);
+        double vy = Math.Round(velocity.y, 3);
+        double vz = Math.Round(velocity.z, 3);
+        websocket.SendText(ComposeMessage(OutEventType.POS_SYNC, new { px, py, pz, vx, vy, vz }));
     }
 }

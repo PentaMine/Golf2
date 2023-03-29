@@ -108,7 +108,7 @@ GameObject:
   - component: {fileID: 6561616741411927592}
   m_Layer: 0
   m_Name: PlayerBody
-  m_TagString: Untagged
+  m_TagString: PlayerBody
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -238,9 +238,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 210052adc1dacd642932e2edcf272191, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0
   rb: {fileID: 0}
-  cam: {fileID: 0}
   player: {fileID: 0}
   launchIndicator: {fileID: 0}
   indicatorRenderer: {fileID: 0}
@@ -253,6 +251,7 @@ MonoBehaviour:
   parent: {fileID: 0}
   gameManager: {fileID: 0}
   launchStripSegments: []
+  isOnline: 0
 --- !u!1 &1670509934714353534
 GameObject:
   m_ObjectHideFlags: 0
@@ -395,7 +394,7 @@ GameObject:
   - component: {fileID: 6382332336849529548}
   m_Layer: 0
   m_Name: player
-  m_TagString: Untagged
+  m_TagString: Respawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

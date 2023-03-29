@@ -1466,6 +1466,7 @@ MonoBehaviour:
   playerPrefab: {fileID: 4942567601416677043, guid: 3be69bc69bae8034b87323b3c11e5ba8, type: 3}
   boostPadPrefab: {fileID: 807610258762776425, guid: 28e94e9abbfe00b4b862fda2071182cf, type: 3}
   wallPrefab: {fileID: 257613135496124478, guid: e4b1e6780f8ee6f4e920ae727181a556, type: 3}
+  isOnline: 0
 --- !u!114 &1358247725
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1479,8 +1480,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
+  finalDuration: 0
+  gameDuration: 0
   isPaused: 0
-  isMultiplayer: 0
+  pauseScreen: {fileID: 0}
 --- !u!4 &1358247726
 Transform:
   m_ObjectHideFlags: 0
@@ -1869,7 +1872,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1691687837}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1696794669998c143bbc1c7929ccf906, type: 3}
+  m_Script: {fileID: 11500000, guid: dc3f167048d61a544b6e1df9e50df787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1789916102
@@ -2016,7 +2019,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1789916102}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1696794669998c143bbc1c7929ccf906, type: 3}
+  m_Script: {fileID: 11500000, guid: dc3f167048d61a544b6e1df9e50df787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1807906762
@@ -2442,7 +2445,7 @@ GameObject:
   - component: {fileID: 2094066837}
   - component: {fileID: 2094066836}
   - component: {fileID: 2094066835}
-  - component: {fileID: 2094066834}
+  - component: {fileID: 2094066838}
   m_Layer: 5
   m_Name: mainMenu
   m_TagString: Untagged
@@ -2471,18 +2474,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -143}
   m_SizeDelta: {x: 550, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2094066834
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2094066832}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1696794669998c143bbc1c7929ccf906, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &2094066835
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2527,8 +2518,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2094066834}
-        m_TargetAssemblyTypeName: FinishScreenButtonHandler, Assembly-CSharp
+      - m_Target: {fileID: 2094066838}
+        m_TargetAssemblyTypeName: SPFinishButtonHandler, Assembly-CSharp
         m_MethodName: ToMainMenu
         m_Mode: 1
         m_Arguments:
@@ -2577,6 +2568,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2094066832}
   m_CullTransparentMesh: 1
+--- !u!114 &2094066838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2094066832}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc3f167048d61a544b6e1df9e50df787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2120653315
 GameObject:
   m_ObjectHideFlags: 0

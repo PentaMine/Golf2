@@ -1,14 +1,18 @@
-using UnityEngine;
-using UnityEngine.Serialization;
+﻿using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager instance;
     public GameState state;
-    private float finalDuration;
-    private float gameDuration;
-    private Canvas pauseScreen;
+    public float finalDuration;
+    public float gameDuration;
     public bool isPaused;
+    public Canvas pauseScreen;
+    public static GameManager instance;
+    private bool isOnline;
+
+    public delegate void PausedChange(bool isPaused);
+
+    public event PausedChange OnPausedChange;
 
     public enum GameState
     {
@@ -17,56 +21,18 @@ public class GameManager : MonoBehaviour
         END // the player reached the hole
     }
 
-    void Awake()
+    public GameManager(bool isOnline)
     {
-        instance = this;
-        state = GameState.START;
-        pauseScreen = GameObject.FindGameObjectWithTag("PauseScreen").GetComponent<Canvas>();
-        pauseScreen.enabled = false;
-
-        // subscribe to game events
         HoleController.onPlayerFinish += OnPlayerFinish;
         PlayerController.onPlayerShoot += OnPlayerShoot;
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            isPaused = !isPaused;
-            pauseScreen.enabled = isPaused;
-            if (isPaused)
-            {
-                Pause();
-            }
-            else
-            {
-                UnPause();
-            }
-        }
-
-        if (!isPaused && state != GameState.START)
-        {
-            gameDuration += Time.deltaTime;
-        }
-    }
-
-    void OnPlayerFinish()
-    {
-        finalDuration = GetGameDuration();
-        state = GameState.END;
-        // display the end screen
-        GameObject.FindGameObjectWithTag("Overlay").GetComponent<Canvas>().enabled = true;
-    }
-
-    void OnPlayerShoot(Vector3 force)
-    {
-        state = GameState.ONGOING;
+        state = GameState.START;
+        instance = this;
+        this.isOnline = isOnline;
     }
 
     public float GetGameDuration()
     {
-        if (state == GameState.START)
+        if (state == GameState.START && !isOnline)
         {
             return 0;
         }
@@ -79,20 +45,30 @@ public class GameManager : MonoBehaviour
         return gameDuration;
     }
 
-    private void UnPause()
+    private void Update()
     {
-        // let time flow at the normal rate
-        Time.timeScale = 1f;
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            isPaused = !isPaused;
+            if (OnPausedChange != null) OnPausedChange(isPaused);
+        }
+
+        if ((!isPaused && state != GameState.START) || isOnline)
+        {
+            gameDuration += Time.deltaTime;
+        }
     }
 
-    private void Pause()
+    void OnPlayerFinish()
     {
-        // stop time
-        Time.timeScale = 0f;
+        finalDuration = GetGameDuration();
+        // display the end screen
+        GameObject.FindGameObjectWithTag("Overlay").GetComponent<Canvas>().enabled = true;
+        state = GameState.END;
     }
 
-    private void OnDestroy()
+    void OnPlayerShoot(Vector3 force)
     {
-        UnPause();
+        state = GameState.ONGOING;
     }
 }

@@ -121,9 +121,10 @@ public class Golf2Api
     }
 
     public ApiResponse authenticateClient(string name)
-    {
+    {   
         try
         {
+            name = name.Trim(trimChars: new[] { ' ', '\u200b' });
             Response response = makeRequest("/clientauth", HttpMethod.Post, body: JsonConvert.SerializeObject(new { name = name }));
             Debug.Log(response.body);
 

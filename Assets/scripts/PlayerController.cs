@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     public GameObject parent;
     public GameManager gameManager;
     public List<GameObject> launchStripSegments;
+    public bool isOnline;
 
     public delegate void OnPlayerShoot(Vector3 force);
 
@@ -32,9 +33,10 @@ public class PlayerController : MonoBehaviour
         canvas = GameObject.FindGameObjectWithTag("Overlay").GetComponent<Canvas>();
         hole = GameObject.FindGameObjectWithTag("Hole");
         parent = transform.parent.gameObject;
-        gameManager = GameManager.instance;
         launchStripSegments = new List<GameObject>(GameObject.FindGameObjectsWithTag("LaunchStrip"));
         canvas.enabled = false;
+
+        gameManager = GameManager.instance;
     }
 
     // Update is called once per frame
@@ -44,7 +46,7 @@ public class PlayerController : MonoBehaviour
         // children inherit the rotation and at that point setting the rotation every frame is the same as setting the pos
         player.transform.position = transform.position;
         launchIndicator.transform.position = new Vector3(transform.position.x, 0.02f, transform.position.z);
-
+        
         // unallow player input if the game ended
         if (gameManager.state == GameManager.GameState.END || gameManager.isPaused)
         {
