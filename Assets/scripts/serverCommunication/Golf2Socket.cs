@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using NativeWebSocket;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using UnityEngine.PlayerLoop;
-using UnityEngine.UIElements;
 
 //using WebSocketSharp;
 
@@ -40,10 +38,17 @@ public class Golf2Socket
     public delegate void PosSyncEvent(string user, Vector3 pos, Vector3 velocity);
 
     public static event PosSyncEvent OnPosSync;
-    
+
     public delegate void EndOfSessionEvent();
 
     public static event EndOfSessionEvent OnSessionEnd;
+
+    public delegate void EndOfGameEvent(List<PlayerScore> scores);
+
+    public static event EndOfGameEvent OnGameEnd;
+    public delegate void ErrorEvent(string reason);
+
+    public static event ErrorEvent OnError;
 
     public class SyncData
     {
@@ -59,6 +64,18 @@ public class Golf2Socket
         }
     }
 
+    public class PlayerScore
+    {
+        public string name;
+        public float score;
+
+        public PlayerScore(string name, float score)
+        {
+            this.name = name;
+            this.score = score;
+        }
+    }
+
     // outgoing events
     private enum OutEventType
     {
@@ -66,7 +83,9 @@ public class Golf2Socket
         DISCONNECT = 1,
         SET_READY = 2,
         SET_UNREADY = 3,
-        POS_SYNC = 4
+        POS_SYNC = 4,
+        FINISH = 5,
+        REFRESH = 6
     }
 
     // incoming events
@@ -78,13 +97,36 @@ public class Golf2Socket
         MAP_SYNC = 3,
         SESSION_COUNTDOWN = 4,
         POS_SYNC = 5,
-        END_OF_SESSION = 6
+        SESSION_CLOSED = 6,
+        GAME_FINISHED = 7
     }
 
     private class Message
     {
         public int type;
         public object content;
+    }
+    
+    private class NakMessage
+    {
+        public int type;
+        public Content content;
+        public class Content
+        {
+            public string reason;
+        }
+    }
+
+    private class GameEndMessage
+    {
+        public int type;
+        public Content content;
+
+        public class Content
+        {
+            public string[] participants;
+            public float[] scores;
+        }
     }
 
     private class PosSyncMessage
@@ -188,34 +230,35 @@ public class Golf2Socket
     private void OnSocketOpen()
     {
         if (OnSocketConnect != null) OnSocketConnect();
-        Debug.Log("Connection open");
+        //Debug.Log("Connection open");
     }
 
     private void OnSocketError(string e)
     {
-        Debug.Log("WebSocket error: " + e);
+        if (OnError != null) OnError(e);
+        Debug.LogError(e);
+        //Debug.Log("WebSocket error: " + e);
     }
 
     private void OnSocketClose(WebSocketCloseCode e)
     {
-        Debug.Log("Connection closed");
+        //Debug.Log("Connection closed");
     }
 
     private void OnSocketMessage(byte[] bytes)
     {
         var messageText = System.Text.Encoding.UTF8.GetString(bytes);
-        Debug.Log("Received: " + messageText);
+        //Debug.Log("Received: " + messageText);
 
         Message message = JsonConvert.DeserializeObject<Message>(messageText);
 
         switch (message.type)
         {
             case (int)InEventType.HANDSHAKE_ACK:
-                Debug.Log("auth to session");
                 isAuthorisedToSession = true;
                 break;
             case (int)InEventType.HANDSHAKE_NAK:
-                Debug.LogError("unauth to session");
+                HandleNak(messageText);
                 isAuthorisedToSession = false;
                 break;
             case (int)InEventType.SYNCHRONISE:
@@ -230,10 +273,37 @@ public class Golf2Socket
             case (int)InEventType.POS_SYNC:
                 HandlePosSync(messageText);
                 break;
-            case (int)InEventType.END_OF_SESSION:
+            case (int)InEventType.SESSION_CLOSED:
                 HandleEndOfSession();
                 break;
+            case (int)InEventType.GAME_FINISHED:
+                HandleGameEnd(messageText);
+                break;
         }
+    }
+
+    private void HandleNak(string messageText)
+    {
+        NakMessage message = JsonConvert.DeserializeObject<NakMessage>(messageText);
+        if (OnError != null) OnError(message.content.reason);
+    }
+
+    private void HandleGameEnd(string messageText)
+    {
+        List<PlayerScore> scores = new List<PlayerScore>();
+        GameEndMessage message = JsonConvert.DeserializeObject<GameEndMessage>(messageText);
+
+        for (int i = 0; i < message.content.participants.Length; i++)
+        {
+            scores.Add(new PlayerScore(
+                message.content.participants[i],
+                message.content.scores[i]
+            ));
+        }
+
+        scores = scores.OrderBy(s => s.score).ToList();
+
+        if (OnGameEnd != null) OnGameEnd(scores);
     }
 
     private void HandleEndOfSession()
@@ -333,7 +403,6 @@ public class Golf2Socket
         }
 
         string message = ComposeMessage(OutEventType.HANDSHAKE, new { socketArg });
-        Debug.Log(message);
         websocket.SendText(message);
     }
 
@@ -345,7 +414,6 @@ public class Golf2Socket
 
     public void SetReady()
     {
-        Debug.Log("ready");
         if (!SocketData.isSessionOwner)
         {
             websocket.SendText(ComposeMessage(OutEventType.SET_READY));
@@ -382,11 +450,31 @@ public class Golf2Socket
     {
         double px = Math.Round(pos.x, 2);
         double py = Math.Round(pos.y, 2);
-        double pz = Math.Round(pos.z, 2);        
-        
+        double pz = Math.Round(pos.z, 2);
+
         double vx = Math.Round(velocity.x, 3);
         double vy = Math.Round(velocity.y, 3);
         double vz = Math.Round(velocity.z, 3);
         websocket.SendText(ComposeMessage(OutEventType.POS_SYNC, new { px, py, pz, vx, vy, vz }));
+    }
+
+    public void SendFinishPacket()
+    {
+        double time = Math.Round(GameManager.instance.GetGameDuration(), 3);
+
+        websocket.SendText(ComposeMessage(
+            OutEventType.FINISH,
+            new { time }
+        ));
+    }
+
+    public void Refresh()
+    {
+        websocket.SendText(ComposeMessage(OutEventType.REFRESH));
+    }
+
+    public void ResetSession()
+    {
+        isMapSent = false;
     }
 }

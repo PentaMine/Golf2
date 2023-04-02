@@ -51,6 +51,9 @@ public class MultiplayerMenuHandler : MonoBehaviour
             case Golf2Api.ApiResponse.NO_INTERNET:
                 errorMessageComponent.text = "NO INTERNET CONNECTION";
                 break;
+            case Golf2Api.ApiResponse.OK:
+                auth = true;
+                break;
         }
 
         noAuthCanvas.enabled = !auth;
@@ -62,8 +65,6 @@ public class MultiplayerMenuHandler : MonoBehaviour
         auth = verification == Golf2Api.ApiResponse.OK;
         isNoInternet = verification == Golf2Api.ApiResponse.NO_INTERNET;
         isConnectionAttempted = true;
-        Debug.Log(isNoInternet);
-        Debug.Log(api.verifyAuth());
     }
 
     private void FixedUpdate()
@@ -73,7 +74,6 @@ public class MultiplayerMenuHandler : MonoBehaviour
         noInternetCanvas.enabled = isNoInternet;
         if (sessions.Count > 0 && !areSessionsLoaded)
         {
-            Debug.Log(sessions.Count);
             foreach (Golf2Api.Session session in sessions)
             {
                 Instantiate(sessionButtonPrefab, Vector3.zero, Quaternion.Euler(Vector3.zero), sessionInfoContent.transform).GetComponent<SessionButtonController>().SetData(session.owner, session.participants, session.id);
@@ -87,7 +87,6 @@ public class MultiplayerMenuHandler : MonoBehaviour
         api.createSession(out string socketArg);
         SocketData.socketArg = socketArg;
         SocketData.isSessionOwner = true;
-        Debug.Log(socketArg);
         SceneManager.LoadScene("SessionMenu");
     }
 }

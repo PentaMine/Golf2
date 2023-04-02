@@ -1,10 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 public class PlayerListController : MonoBehaviour
 {
+    private const string croText = " (spreman)";
+    private const string engText = " (ready)";
     public GameObject ownerObject;
     public GameObject participantsObject;
     private TextMeshProUGUI owner;
@@ -19,11 +19,14 @@ public class PlayerListController : MonoBehaviour
     // Update is called once per frame
     void UpdateText(Golf2Socket.SyncData data)
     {
-        owner.text = data.owner + (data.ready.Contains(data.owner) ? " (ready)" : "");
+
+        string readyText = SettingManager.settings.lang == SettingManager.Language.ENGLISH ? engText : croText;
+        
+        owner.text = data.owner + (data.ready.Contains(data.owner) ? readyText : "");
         string participantsText = "";
         foreach (var participant in data.participants)
         {
-            participantsText += participant + (data.ready.Contains(participant) ? " (ready)" : "") + "\n";
+            participantsText += participant + (data.ready.Contains(participant) ? readyText : "") + "\n";
         }
 
         participants.text = participantsText;

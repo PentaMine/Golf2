@@ -59,8 +59,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void OnPlayerFinish()
+    void OnPlayerFinish(string name)
     {
+        if (isOnline)
+        {
+            return;
+        }
         finalDuration = GetGameDuration();
         // display the end screen
         GameObject.FindGameObjectWithTag("Overlay").GetComponent<Canvas>().enabled = true;

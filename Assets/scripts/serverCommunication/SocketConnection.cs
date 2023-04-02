@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using NativeWebSocket;
+﻿using NativeWebSocket;
 using UnityEngine;
 
 public class SocketConnection : MonoBehaviour
@@ -8,16 +7,30 @@ public class SocketConnection : MonoBehaviour
     private bool initAttempted = false;
     private float timePassed;
     public static SocketConnection instance;
+    private bool didReturn;
 
     void Start()
     {
+        
         instance = this;
-        socketManager = new Golf2Socket(SocketData.socketArg);
+        if (SessionData.isReturning)
+        {
+            socketManager = SessionData.socketManager;
+            socketManager.Refresh();
+            didReturn = true;
+            SessionData.isReturning = false;
+        }
+        else
+        {
+            socketManager = new Golf2Socket(SocketData.socketArg);
+        }
+
+        Golf2Socket.OnError += reason => Debug.LogError(reason);
     }
 
     void Update()
     {
-        if (socketManager.websocket.State == WebSocketState.Open && !initAttempted)
+        if (socketManager.websocket.State == WebSocketState.Open && !initAttempted && !didReturn)
         {
             initAttempted = true;
             socketManager.SendSocketArg();

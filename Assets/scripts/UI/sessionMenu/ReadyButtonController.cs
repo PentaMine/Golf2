@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using TMPro;
 using UnityEngine;
@@ -15,6 +12,9 @@ public class ReadyButtonController : MonoBehaviour
     void Start()
     {
         textComponent = transform.Find("Text (TMP)").GetComponent<TextMeshProUGUI>();
+
+        textComponent.text = SettingManager.settings.lang == SettingManager.Language.ENGLISH ? "READY" : "SPREMAN";
+        
         GetComponent<Button>().onClick.AddListener(() =>
         {
             isReady = !isReady;
@@ -28,13 +28,11 @@ public class ReadyButtonController : MonoBehaviour
     {
         if (state)
         {
-            //textComponent.text = "UNREADY";
             // send to server asynchronously
             new Thread(SocketConnection.instance.socketManager.SetReady).Start();
         }
         else
         {
-            //textComponent.text = "READY";
             // send to server asynchronously
             new Thread(SocketConnection.instance.socketManager.SetUnready).Start();
         }
@@ -44,11 +42,11 @@ public class ReadyButtonController : MonoBehaviour
     {
         if (data.ready.Contains(SettingManager.settings.name))
         {
-            textComponent.text = "UNREADY";
+            textComponent.text = SettingManager.settings.lang == SettingManager.Language.ENGLISH ? "UNREADY" : "NESPREMAN";
         }
         else
         {
-            textComponent.text = "READY";
+            textComponent.text = SettingManager.settings.lang == SettingManager.Language.ENGLISH ? "READY" : "SPREMAN";;
         }
     }
 }

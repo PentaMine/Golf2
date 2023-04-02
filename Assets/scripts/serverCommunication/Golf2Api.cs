@@ -126,14 +126,12 @@ public class Golf2Api
         {
             name = name.Trim(trimChars: new[] { ' ', '\u200b' });
             Response response = makeRequest("/clientauth", HttpMethod.Post, body: JsonConvert.SerializeObject(new { name = name }));
-            Debug.Log(response.body);
 
             if (response.code == HttpStatusCode.OK)
             {
                 SettingManager.settings.authToken = JsonConvert.DeserializeObject<ClientAuthResponse>(response.body).response.token;
                 SettingManager.settings.name = name;
                 SettingManager.SaveSettings();
-                Debug.Log(response.body);
                 return ApiResponse.OK;
             }
 
@@ -164,7 +162,6 @@ public class Golf2Api
         try
         {
             Response response = makeRequest("/browsesessions", HttpMethod.Post, body: JsonConvert.SerializeObject(new { count = 5 }));
-            Debug.Log(response.body);
 
             if (response.code == HttpStatusCode.OK)
             {

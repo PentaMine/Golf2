@@ -1,7 +1,4 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
@@ -9,13 +6,20 @@ using UnityEngine.Serialization;
 public class OnlineGameManager : GameManager
 {
     public GameObject playerBodyPrefab;
+    public Material player1Material;
+    public Material player2Material;
+    public Material player3Material;
+    public Material player4Material;
+
+    private List<Material> materials;
     private Golf2Socket socketManager;
     private GameObject player;
     private Rigidbody playerRb;
     private Dictionary<string, Player> foreignPlayers = new Dictionary<string, Player>();
     private List<string> participants;
-    private const string foreignPlayerPrefix = "FP";
     private Canvas endCanvas;
+    private Canvas scoreboard;
+    private int playersFinished;
 
     private class Player
     {
@@ -43,14 +47,18 @@ public class OnlineGameManager : GameManager
         pauseScreen = GameObject.FindGameObjectWithTag("PauseScreen").GetComponent<Canvas>();
         pauseScreen.enabled = false;
         endCanvas = GameObject.FindGameObjectWithTag("EndScreen").GetComponent<Canvas>();
+        scoreboard = GameObject.FindGameObjectWithTag("Scoreboard").GetComponent<Canvas>();
+        materials = new List<Material> { player1Material, player2Material, player3Material, player4Material };
 
         Golf2Socket.OnPosSync += OnPosSync;
         Golf2Socket.OnPlayerSync += HandlePlayerLeaving;
         Golf2Socket.OnSessionEnd += HandleSessionEnd;
-
-        CreateForeignPlayers();
+        HoleController.onPlayerFinish += HandlePlayerFinish;
+        Golf2Socket.OnGameEnd += HandleGameEnd;
 
         participants = new List<string>(socketManager.participants);
+
+        CreateForeignPlayers();
     }
 
     void FixedUpdate()
@@ -78,11 +86,9 @@ public class OnlineGameManager : GameManager
 
     void CreateForeignPlayers()
     {
-        socketManager.participants.ForEach(s => { Debug.LogAssertion(s); });
         float distanceBetweenPlayers = 1.5f;
         float fullDistance = (socketManager.participants.Count - 1) * distanceBetweenPlayers;
         Vector3 startPos = player.transform.position - new Vector3(0, 0, fullDistance / 2);
-
         for (int i = 0; i < socketManager.participants.Count; i++)
         {
             Vector3 pos = startPos + new Vector3(0, 0, distanceBetweenPlayers * i);
@@ -90,12 +96,14 @@ public class OnlineGameManager : GameManager
             if (!socketManager.participants[i].Equals(SettingManager.settings.name))
             {
                 GameObject foreignPlayer = Instantiate(playerBodyPrefab, pos + new Vector3(0, .501f, 0), Quaternion.Euler(Vector3.zero));
-                //foreignPlayer.tag = foreignPlayerPrefix + socketManager.participants[i];
+                foreignPlayer.GetComponent<MeshRenderer>().material = materials[i];
+                foreignPlayer.name = socketManager.participants[i];
                 foreignPlayers.Add(socketManager.participants[i], new Player(foreignPlayer));
             }
             else
             {
                 player.transform.position = pos;
+                player.GetComponent<PlayerController>().SetMaterial( materials[i]);
             }
         }
     }
@@ -107,14 +115,17 @@ public class OnlineGameManager : GameManager
 
     private void HandlePlayerLeaving(Golf2Socket.SyncData data)
     {
-        Debug.LogWarning("fsdfsdfsdfdsd");
         foreach (var participant in participants)
         {
             if (!socketManager.participants.Contains(participant))
             {
+                Debug.LogError("left: " + foreignPlayers[participant].playerObject.name);
                 Destroy(foreignPlayers[participant].playerObject);
+                break;
             }
         }
+
+        participants = new List<string>(socketManager.participants);
     }
 
     private void HandleSessionEnd()
@@ -128,5 +139,51 @@ public class OnlineGameManager : GameManager
     private void Exit()
     {
         SceneManager.LoadScene("MultiplayerMenu");
+    }
+
+    private void HandlePlayerFinish(string playerName)
+    {
+        playersFinished++;
+        if (playerName == "PlayerBody")
+        {
+            finalDuration = GetGameDuration();
+            GameObject.FindGameObjectWithTag("Overlay").GetComponent<Canvas>().enabled = true;
+            state = GameState.END;
+            socketManager.SendFinishPacket();
+            return;
+        }
+
+        foreignPlayers[playerName].playerObject.GetComponent<SphereCollider>().enabled = false;
+        foreignPlayers[playerName].playerObject.GetComponent<MeshRenderer>().enabled = false;
+        foreignPlayers[playerName].playerObject.SetActive(false);
+    }
+
+    private void HandleGameEnd(List<Golf2Socket.PlayerScore> scores)
+    {
+        Invoke("DisplayScoreboard", 1.5f);
+        Invoke("LoadSessionMenu", 4.5f);
+        SessionData.isReturning = true;
+
+        socketManager.ResetSession();
+    }
+
+    private void DisplayScoreboard()
+    {
+        scoreboard.enabled = true;
+    }
+
+    private void LoadSessionMenu()
+    {
+        SceneManager.LoadScene("SessionMenu");
+    }
+
+    private void OnDestroy()
+    {
+        Golf2Socket.OnPosSync -= OnPosSync;
+        Golf2Socket.OnPlayerSync -= HandlePlayerLeaving;
+        Golf2Socket.OnSessionEnd -= HandleSessionEnd;
+        HoleController.onPlayerFinish -= HandlePlayerFinish;
+        Golf2Socket.OnGameEnd -= HandleGameEnd;
+        OnPausedChange -= UpdateCanvas;
     }
 }

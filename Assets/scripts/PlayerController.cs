@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,6 +19,7 @@ public class PlayerController : MonoBehaviour
     public GameManager gameManager;
     public List<GameObject> launchStripSegments;
     public bool isOnline;
+    public Material material;
 
     public delegate void OnPlayerShoot(Vector3 force);
 
@@ -37,6 +39,8 @@ public class PlayerController : MonoBehaviour
         canvas.enabled = false;
 
         gameManager = GameManager.instance;
+        
+        DisableRenderingSegments();
     }
 
     // Update is called once per frame
@@ -164,5 +168,16 @@ public class PlayerController : MonoBehaviour
         {
             launchStripSegments[i].GetComponentInChildren<MeshRenderer>().enabled = false;
         }
+    }
+
+    public void SetMaterial(Material material)
+    {
+        foreach (var segment in launchStripSegments)
+        {
+            segment.GetComponentInChildren<MeshRenderer>().material.color = material.color;
+        }
+
+        indicatorRenderer.material = material;
+        GetComponent<MeshRenderer>().material = material;
     }
 }

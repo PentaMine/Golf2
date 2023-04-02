@@ -505,8 +505,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Sa\u0161a je osoba koja je sve ovo sprogramirala, napravila teksture i
-    3d modele. Tako\u0111er on pi\u0161e ovaj tekst."
+  m_text: "Sa\u0161a is the person who programmed this, made the textures and 3D
+    models. He programmed the server for the multiplayer functionality and provide
+    the hardware for the server."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -596,9 +597,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   engTxt: "Sa\u0161a is the person who programmed this, made the textures and 3D
-    models. He is also the one who wrote this."
+    models. He programmed the server for the multiplayer functionality and provide
+    the hardware for the server."
   croTxt: "Sa\u0161a je osoba koja je sve ovo sprogramirala, napravila teksture i
-    3d modele. Tako\u0111er on pi\u0161e ovaj tekst."
+    3d modele. On je osoba koja je sprogramirala server za multiplayer funkcionalnost,
+    tako\u0111er je osigurao hardver za server."
   isAllUpper: 0
 --- !u!1 &1169176891
 GameObject:

@@ -1,10 +1,16 @@
+# WARNING: INCREDIBLY SHITTY CODE AHEAD
+# I wrote the whole procedural generation in two days, the code is SHIT, but it works and does not need to be super
+# efficient because it runs once at the beginning of the level and then never again, so it is good enough
+#
+# also this was supposed to be just a proof of concept, but it made it into the final version of Golf2
+
 import config
 from config import *
 from random import randint
 
 from pathGeneration.Node import Node
 from pathGeneration.BoostPad import BoostPad
-from pathGeneration.dijkstra import find_path
+from pathGeneration.bfs import findPath
 import numpy as np
 
 
@@ -18,11 +24,11 @@ class PathType:
 def generate_map_data(graph: list[list[str]]):
     start, hole = None, None
     path = []
-    while len(path) < MIN_PATH_LENGTH:
+    while len(path) < Config.MIN_PATH_LENGTH:
         nodes = generate_start_and_hole_pos()
         start = nodes[0]
         hole = nodes[1]
-        path = find_path(graph, start, hole)
+        path = findPath(graph, start, hole)
 
     graph[start.y][start.x] = "@"
     graph[hole.y][hole.x] = "X"
@@ -35,7 +41,7 @@ def generate_map_data(graph: list[list[str]]):
     graph[start.y][start.x] = "@"
     graph[hole.y][hole.x] = "X"
 
-    path = find_path(graph, start, hole)
+    path = findPath(graph, start, hole)
 
     draw_path(graph, path)
 
@@ -45,7 +51,7 @@ def generate_map_data(graph: list[list[str]]):
     graph[start.y][start.x] = "@"
     graph[hole.y][hole.x] = "X"
 
-    primary_path = find_path(graph, start, hole)
+    primary_path = findPath(graph, start, hole)
 
     graph[start.y][start.x] = "@"
     graph[hole.y][hole.x] = "X"
@@ -112,15 +118,18 @@ def convert_tuples_to_nodes(tuples):
 
 def generate_start_and_hole_pos():
     model = randint(0, 15)
-    max_x = GRID_WIDTH - 1
-    max_y = GRID_HEIGHT - 1
+    max_x = Config.GRID_WIDTH - 1
+    max_y = Config.GRID_HEIGHT - 1
+
+    print(max_y)
 
     model_binary = list(map(int, '{0:0b}'.format(model)))
     while len(model_binary) < 4:
         model_binary.insert(0, 0)
-
-    start = Node(randint(MIN_HOLE_INDENT, MAX_HOLE_INDENT), randint(MIN_HOLE_INDENT, MAX_HOLE_INDENT))
-    hole = Node(randint(MIN_HOLE_INDENT, MAX_HOLE_INDENT), randint(MIN_HOLE_INDENT, MAX_HOLE_INDENT))
+    print(model_binary)
+    print()
+    start = Node(randint(Config.MIN_HOLE_INDENT, Config.MAX_HOLE_INDENT), randint(Config.MIN_HOLE_INDENT, Config.MAX_HOLE_INDENT))
+    hole = Node(randint(Config.MIN_HOLE_INDENT, Config.MAX_HOLE_INDENT), randint(Config.MIN_HOLE_INDENT, Config.MAX_HOLE_INDENT))
 
     start.x = max_x - start.x if model_binary[0] else start.x
     hole.x = max_x - hole.x if model_binary[1] else hole.x
@@ -132,7 +141,7 @@ def generate_start_and_hole_pos():
 
 
 def complicate_path(path, graph):
-    points = randint(2, 4)
+    points = randint(Config.MIN_COMPLICATE, Config.MAX_COMPLICATE)
     split_points = []
     for i in np.array_split(np.array(path), points)[:-1]:
         split_points.append(i[-1])
@@ -166,11 +175,11 @@ def get_path_type_at_point(point: Node, graph, is_random=True):
 
 
 def is_index_in_range_x(index):
-    return 0 <= index < config.GRID_WIDTH
+    return 0 <= index < Config.GRID_WIDTH
 
 
 def is_index_in_range_y(index):
-    return 0 <= index < config.GRID_HEIGHT
+    return 0 <= index < Config.GRID_HEIGHT
 
 
 def insert_barrier(pos: Node, typ, graph):
@@ -318,7 +327,7 @@ def make_forks(graph, path, hole, start):
 
     graph[start.y][start.x] = "@"
     graph[hole.y][hole.x] = "X"
-    found_path = find_path(graph, start, hole)
+    found_path = findPath(graph, start, hole)
 
     for i in path:
         found_path.append(i)
@@ -339,7 +348,7 @@ def get_boost_pad_positions(path, graph):
                 point_profiles.append(ii)
                 break
 
-    num = randint(MIN_BOOST_PAD_COUNT, MAX_BOOST_PAD_COUNT)
+    num = randint(Config.MIN_BOOST_PAD_COUNT, Config.MAX_BOOST_PAD_COUNT)
     prev = None
     streak = 0
     streaks = []

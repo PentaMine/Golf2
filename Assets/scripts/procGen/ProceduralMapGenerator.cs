@@ -104,7 +104,7 @@ public class ProceduralMapGenerator : MonoBehaviour
     public static void RunPathGeneration()
     {
         string command = "python.exe ../procGen/";
-        string arguments = "/B";
+        string arguments = "";
         
         Process process = new Process();
 
