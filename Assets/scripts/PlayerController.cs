@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour
         canvas.enabled = false;
 
         gameManager = GameManager.instance;
-        
+        SetMaterial(material);
         DisableRenderingSegments();
     }
 
@@ -172,6 +172,12 @@ public class PlayerController : MonoBehaviour
 
     public void SetMaterial(Material material)
     {
+
+        if (material == null)
+        {
+            return;
+        }
+        
         foreach (var segment in launchStripSegments)
         {
             segment.GetComponentInChildren<MeshRenderer>().material.color = material.color;

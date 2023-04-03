@@ -82,8 +82,7 @@ public class ProceduralMapGenerator : MonoBehaviour
                 MathUtil.RoundToMultiple(MathUtil.radiansToDegrees(Mathf.Atan2(delta.x, delta.y)), 45), 0)));
         }
         // create the player
-        GameObject player = Instantiate(playerPrefab, (new Vector3(mapData.start.x, 0, mapData.start.y) - endV3) * 10, Quaternion.Euler(Vector3.zero));
-        //player.GetComponent<PlayerController>().gameManager = isOnline ? OnlineGameManager.instance : OfflineGameManager.instance;
+        Instantiate(playerPrefab, (new Vector3(mapData.start.x, 0, mapData.start.y) - endV3) * 10, Quaternion.Euler(new Vector3()));
     }
 
     public static List<Vector2> GetVectorsFromCsv(List<string> contents)

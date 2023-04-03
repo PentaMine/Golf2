@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -57,7 +58,6 @@ public class OnlineGameManager : GameManager
         Golf2Socket.OnGameEnd += HandleGameEnd;
 
         participants = new List<string>(socketManager.participants);
-
         CreateForeignPlayers();
     }
 
@@ -103,7 +103,7 @@ public class OnlineGameManager : GameManager
             else
             {
                 player.transform.position = pos;
-                player.GetComponent<PlayerController>().SetMaterial( materials[i]);
+                player.GetComponent<PlayerController>().material = materials[i];
             }
         }
     }
@@ -185,5 +185,10 @@ public class OnlineGameManager : GameManager
         HoleController.onPlayerFinish -= HandlePlayerFinish;
         Golf2Socket.OnGameEnd -= HandleGameEnd;
         OnPausedChange -= UpdateCanvas;
+    }
+
+    private void OnDisable()
+    {
+        Debug.Log("dsa");
     }
 }

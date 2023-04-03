@@ -248,7 +248,7 @@ public class Golf2Socket
     private void OnSocketMessage(byte[] bytes)
     {
         var messageText = System.Text.Encoding.UTF8.GetString(bytes);
-        //Debug.Log("Received: " + messageText);
+        Debug.Log("Received: " + messageText);
 
         Message message = JsonConvert.DeserializeObject<Message>(messageText);
 
@@ -448,9 +448,9 @@ public class Golf2Socket
 
     public void UpdatePos(Vector3 pos, Vector3 velocity)
     {
-        double px = Math.Round(pos.x, 2);
-        double py = Math.Round(pos.y, 2);
-        double pz = Math.Round(pos.z, 2);
+        double px = Math.Round(pos.x, 3);
+        double py = Math.Round(pos.y, 3);
+        double pz = Math.Round(pos.z, 3);
 
         double vx = Math.Round(velocity.x, 3);
         double vy = Math.Round(velocity.y, 3);

@@ -10,6 +10,7 @@ public class MainMenuButtonHandler : MonoBehaviour
 
     public void ToGeneratedLevels()
     {
+        GameObject.FindGameObjectWithTag("Loading").GetComponent<Canvas>().enabled = true;
         SceneManager.LoadScene("GeneratedLevel");
     }
 
