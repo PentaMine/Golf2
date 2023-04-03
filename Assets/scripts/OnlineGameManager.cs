@@ -119,7 +119,6 @@ public class OnlineGameManager : GameManager
         {
             if (!socketManager.participants.Contains(participant))
             {
-                Debug.LogError("left: " + foreignPlayers[participant].playerObject.name);
                 Destroy(foreignPlayers[participant].playerObject);
                 break;
             }

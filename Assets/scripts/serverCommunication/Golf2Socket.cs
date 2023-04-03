@@ -248,7 +248,6 @@ public class Golf2Socket
     private void OnSocketMessage(byte[] bytes)
     {
         var messageText = System.Text.Encoding.UTF8.GetString(bytes);
-        Debug.Log("Received: " + messageText);
 
         Message message = JsonConvert.DeserializeObject<Message>(messageText);
 
@@ -420,8 +419,8 @@ public class Golf2Socket
             return;
         }
 
-        // don't waste resources if the map has already been generated
-        if (isMapSent)
+        // don't waste resources if the map has already been generated or will not be accepted
+        if (isMapSent || participants.Count == 1)
         {
             websocket.SendText(ComposeMessage(OutEventType.SET_READY));
             return;
@@ -436,7 +435,6 @@ public class Golf2Socket
             SimplifyVector(mapData.start),
             SimplifyVector(mapData.end)
         );
-
         websocket.SendText(ComposeMessage(OutEventType.SET_READY, new { mapData = message }));
         isMapSent = true;
     }
@@ -457,7 +455,7 @@ public class Golf2Socket
         double vz = Math.Round(velocity.z, 3);
         websocket.SendText(ComposeMessage(OutEventType.POS_SYNC, new { px, py, pz, vx, vy, vz }));
     }
-
+    
     public void SendFinishPacket()
     {
         double time = Math.Round(GameManager.instance.GetGameDuration(), 3);
