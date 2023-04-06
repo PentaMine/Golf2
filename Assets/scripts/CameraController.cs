@@ -22,7 +22,6 @@ public class CameraController : MonoBehaviour
         for (int i = 1; i < 30; i++)
         {
             distances.Add((int)Mathf.Pow(distances[i - 1], 1.02f));
-            Debug.Log(i + " " + (int)Mathf.Pow(distances[i - 1], 1.02f));
         }
         
         distances.Reverse();

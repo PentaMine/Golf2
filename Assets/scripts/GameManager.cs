@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             isPaused = !isPaused;
-            if (OnPausedChange != null) OnPausedChange(isPaused);
+            if (OnPausedChange != null && state != GameState.END) OnPausedChange(isPaused);
         }
 
         if ((!isPaused && state != GameState.START) || isOnline)
