@@ -68,7 +68,7 @@ public class PlayerController : MonoBehaviour
         rb.velocity = vel;
         
         // mark the object as stationary if its velocity in any direction does not exceed 0.1
-        isStationary = VectorUtil.IsWithinTolerance(rb.velocity, new Vector3(.1f, .1f, .1f));
+        isStationary = VectorUtil.IsWithinTolerance(rb.velocity, new Vector3(.8f,.8f, .8f));
         
         // I ShouldDie()
         // respawn the player if it is too low or high

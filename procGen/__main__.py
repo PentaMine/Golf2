@@ -12,7 +12,7 @@ argparser.add_argument("-mpl", "--minPathLength", default=15, type=int)
 argparser.add_argument("-minbp", "--minBoostPads", default=1, type=int)
 argparser.add_argument("-maxbp", "--maxBoostPads", default=3, type=int)
 argparser.add_argument("-minc", "--minComplicate", default=3, type=int)
-argparser.add_argument("-maxc", "--maxComplicate", default=3, type=int)
+argparser.add_argument("-maxc", "--maxComplicate", default=4, type=int)
 
 args = argparser.parse_args()
 
