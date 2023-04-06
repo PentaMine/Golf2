@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.VisualScripting;
+using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
@@ -74,5 +75,11 @@ public class GameManager : MonoBehaviour
     void OnPlayerShoot(Vector3 force)
     {
         state = GameState.ONGOING;
+    }
+
+    void OnDisable()
+    {
+        HoleController.onPlayerFinish -= OnPlayerFinish;
+        PlayerController.onPlayerShoot -= OnPlayerShoot;
     }
 }

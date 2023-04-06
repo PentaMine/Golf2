@@ -143,7 +143,7 @@ public class OnlineGameManager : GameManager
     private void HandlePlayerFinish(string playerName)
     {
         playersFinished++;
-        if (playerName == "PlayerBody")
+        if (playerName.Equals("PlayerBody"))
         {
             finalDuration = GetGameDuration();
             GameObject.FindGameObjectWithTag("Overlay").GetComponent<Canvas>().enabled = true;
@@ -184,10 +184,5 @@ public class OnlineGameManager : GameManager
         HoleController.onPlayerFinish -= HandlePlayerFinish;
         Golf2Socket.OnGameEnd -= HandleGameEnd;
         OnPausedChange -= UpdateCanvas;
-    }
-
-    private void OnDisable()
-    {
-        Debug.Log("dsa");
     }
 }

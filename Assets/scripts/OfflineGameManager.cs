@@ -13,7 +13,7 @@ public class OfflineGameManager : GameManager
         pauseScreen.enabled = false;
     }
 
-    private void OnDestroy()
+    public void OnDestroy()
     {
         Time.timeScale = 1f;
         OnPausedChange -= UpdateCanvas;
