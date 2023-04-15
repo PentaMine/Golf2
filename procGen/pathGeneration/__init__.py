@@ -1,5 +1,5 @@
-# WARNING: INCREDIBLY SHITTY CODE AHEAD
-# I wrote the whole procedural generation in two days, the code is SHIT, but it works and does not need to be super
+# WARNING: INCREDIBLY CRAPPY CODE AHEAD
+# I wrote the whole procedural generation in two days, the code is CRAP, but it works and does not need to be super
 # efficient because it runs once at the beginning of the level and then never again, so it is good enough
 #
 # also this was supposed to be just a proof of concept, but it made it into the final version of Golf2
