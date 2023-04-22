@@ -420,7 +420,8 @@ public class Golf2Socket
         }
 
         // don't waste resources if the map has already been generated or will not be accepted
-        if (isMapSent || participants.Count == 1)
+        // TODO: UNCOMMENT IN PROD
+        if (isMapSent /*|| participants.Count == 1*/)
         {
             websocket.SendText(ComposeMessage(OutEventType.SET_READY));
             return;
@@ -435,6 +436,7 @@ public class Golf2Socket
             SimplifyVector(mapData.start),
             SimplifyVector(mapData.end)
         );
+
         websocket.SendText(ComposeMessage(OutEventType.SET_READY, new { mapData = message }));
         isMapSent = true;
     }

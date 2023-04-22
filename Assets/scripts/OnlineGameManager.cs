@@ -86,9 +86,72 @@ public class OnlineGameManager : GameManager
 
     void CreateForeignPlayers()
     {
+        int playerCount = socketManager.participants.Count;
+        float angleStep = 360 / playerCount;
+        float distance = 3.8f;
+        Vector2 start = SessionData.mapData.start;
+        Vector3 endV3 = new Vector3(SessionData.mapData.end.x, 0, SessionData.mapData.end.y);
+        Vector3 startPos = (new Vector3(start.x, 0, start.y) - endV3) * 10;
+        startPos.y = .5f;
+        Debug.Log(startPos);
+        Debug.DrawRay(startPos, Vector3.up, Color.green, 50000);
+
+        List<Vector3> positions = new List<Vector3>();
+
+        float maxX = float.NegativeInfinity;
+        float minX = float.PositiveInfinity;
+
+        float maxZ = float.NegativeInfinity;
+        float minZ = float.PositiveInfinity;
+
+
+        for (int i = 0; i < playerCount; i++)
+        {
+            Vector3 pos;
+            if (!socketManager.participants[i].Equals(SettingManager.settings.name))
+            {
+                GameObject foreignPlayer = Instantiate(playerBodyPrefab, startPos + new Vector3(0, 0, distance), Quaternion.Euler(Vector3.zero));
+                foreignPlayer.transform.RotateAround(startPos, Vector3.up, angleStep * i + 60);
+                Debug.DrawRay(foreignPlayer.transform.position, Vector3.up, Color.red, 50000);
+
+                pos = foreignPlayer.transform.position;
+
+                foreignPlayer.GetComponent<MeshRenderer>().material = materials[0]; // TODO: REPLACE WITH SOMETHING USEFUL
+                foreignPlayer.name = socketManager.participants[i];
+                foreignPlayers.Add(socketManager.participants[i], new Player(foreignPlayer));
+            }
+            else
+            {
+                player.transform.position = startPos + new Vector3(0, 0, distance);
+                player.transform.RotateAround(startPos, Vector3.up, angleStep * i + 60);
+                pos = player.transform.position;
+
+                player.GetComponent<PlayerController>().material = materials[i];
+            }
+
+            if (pos.x > maxX)
+                maxX = pos.x;
+            if (pos.z > maxZ)
+                maxZ = pos.z;
+            if (pos.x < minX)
+                minX = pos.x;
+            if (pos.z < minZ)
+                minZ = pos.z;
+        }
+
+        maxX -= startPos.x;
+        minX -= startPos.x;
+        maxZ -= startPos.z;
+        minZ -= startPos.z;
+
+        Debug.Log(new Vector2(5 - Mathf.Abs(maxX), 5 - Mathf.Abs(minX)));
+        Debug.Log(new Vector2(5 - Mathf.Abs(maxZ), 5 - Mathf.Abs(minZ)));
+
+
+        /*
         float distanceBetweenPlayers = 1.5f;
         float fullDistance = (socketManager.participants.Count - 1) * distanceBetweenPlayers;
-        Vector3 startPos = player.transform.position - new Vector3(0, 0, fullDistance / 2);
+        
         for (int i = 0; i < socketManager.participants.Count; i++)
         {
             Vector3 pos = startPos + new Vector3(0, 0, distanceBetweenPlayers * i);
@@ -96,7 +159,7 @@ public class OnlineGameManager : GameManager
             if (!socketManager.participants[i].Equals(SettingManager.settings.name))
             {
                 GameObject foreignPlayer = Instantiate(playerBodyPrefab, pos + new Vector3(0, .501f, 0), Quaternion.Euler(Vector3.zero));
-                foreignPlayer.GetComponent<MeshRenderer>().material = materials[i];
+                foreignPlayer.GetComponent<MeshRenderer>().material = materials[0]; // TODO: REPLACE WITH SOMETHING USEFUL
                 foreignPlayer.name = socketManager.participants[i];
                 foreignPlayers.Add(socketManager.participants[i], new Player(foreignPlayer));
             }
@@ -105,7 +168,7 @@ public class OnlineGameManager : GameManager
                 player.transform.position = pos;
                 player.GetComponent<PlayerController>().material = materials[i];
             }
-        }
+        }*/
     }
 
     private void UpdateCanvas(bool isPaused)
