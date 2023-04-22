@@ -12,7 +12,7 @@ public class OnlineGameManager : GameManager
     public Material player3Material;
     public Material player4Material;
 
-    private List<Material> materials;
+    public List<Material> materials;
     private Golf2Socket socketManager;
     private GameObject player;
     private Rigidbody playerRb;
@@ -49,7 +49,7 @@ public class OnlineGameManager : GameManager
         pauseScreen.enabled = false;
         endCanvas = GameObject.FindGameObjectWithTag("EndScreen").GetComponent<Canvas>();
         scoreboard = GameObject.FindGameObjectWithTag("Scoreboard").GetComponent<Canvas>();
-        materials = new List<Material> { player1Material, player2Material, player3Material, player4Material };
+        //materials = new List<Material> { player1Material, player2Material, player3Material, player4Material };
 
         Golf2Socket.OnPosSync += OnPosSync;
         Golf2Socket.OnPlayerSync += HandlePlayerLeaving;
@@ -116,7 +116,7 @@ public class OnlineGameManager : GameManager
 
                 pos = foreignPlayer.transform.position;
 
-                foreignPlayer.GetComponent<MeshRenderer>().material = materials[0]; // TODO: REPLACE WITH SOMETHING USEFUL
+                foreignPlayer.GetComponent<MeshRenderer>().material = materials[i]; // TODO: REPLACE WITH SOMETHING USEFUL
                 foreignPlayer.name = socketManager.participants[i];
                 foreignPlayers.Add(socketManager.participants[i], new Player(foreignPlayer));
             }

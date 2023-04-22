@@ -3886,3 +3886,14 @@ MonoBehaviour:
   player2Material: {fileID: 2100000, guid: ea850135752dc8843b2989586e672a05, type: 2}
   player3Material: {fileID: 2100000, guid: 03ad4fce136942c48b6879c9c6f2ea01, type: 2}
   player4Material: {fileID: 2100000, guid: 0685353385e933445bae246fe9023c14, type: 2}
+  materials:
+  - {fileID: 2100000, guid: 2eda1d053d65a0544bbff47b601cd661, type: 2}
+  - {fileID: 2100000, guid: ea850135752dc8843b2989586e672a05, type: 2}
+  - {fileID: 2100000, guid: 03ad4fce136942c48b6879c9c6f2ea01, type: 2}
+  - {fileID: 2100000, guid: 0685353385e933445bae246fe9023c14, type: 2}
+  - {fileID: 2100000, guid: 2b043ff4cf9cafe49abc963cb6d0af44, type: 2}
+  - {fileID: 2100000, guid: 0338ff48bbcddc9488e9a35a97014791, type: 2}
+  - {fileID: 2100000, guid: 5d8abd51cdad47b4a957a7ef51f57396, type: 2}
+  - {fileID: 2100000, guid: 043ecd2a5225441469cdbf245941a2fb, type: 2}
+  - {fileID: 2100000, guid: 1df10e2db6442ed48b013f8415439978, type: 2}
+  - {fileID: 2100000, guid: 1a749cf4eba7b27489289c7faf42ba27, type: 2}
