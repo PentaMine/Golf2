@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
 using UnityEngine;
-
 
 
 public class Golf2Api
@@ -16,7 +17,8 @@ public class Golf2Api
         NO_INTERNET,
         USERNAME_TAKEN,
         UNAUTHORISED,
-        NOT_IN_SESSION
+        NOT_IN_SESSION,
+        OLD_VERSION
     }
 
     private class Response
@@ -31,7 +33,7 @@ public class Golf2Api
         }
     }
 
-    private class ClientAuthResponse
+    private class OKClientAuthResponse
     {
         public int code;
         public ResponseTag response;
@@ -40,6 +42,12 @@ public class Golf2Api
         {
             public string token;
         };
+    }
+    
+    private class ErrorClientAuthResponse
+    {
+        public int code;
+        public string response;
     }
 
     private class SessionBrowseResponse
@@ -59,7 +67,7 @@ public class Golf2Api
             }
         };
     }
-    
+
     private class SessionJoinResponse
     {
         public int code;
@@ -102,6 +110,7 @@ public class Golf2Api
         using (var response = client.SendAsync(request).GetAwaiter().GetResult())
         {
             var responseBody = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            Debug.Log(SettingManager.settings.getFullHTTPUri(path) + "\n" + body + "\n" + responseBody);
             return new Response(response.StatusCode, responseBody);
         }
     }
@@ -110,8 +119,18 @@ public class Golf2Api
     {
         try
         {
-            Response response = makeRequest("/verifyauth", HttpMethod.Get, SettingManager.settings.authToken);
-            return response.code == HttpStatusCode.OK ? ApiResponse.OK : ApiResponse.UNAUTHORISED;
+            Response response = makeRequest("/verifyauth", HttpMethod.Post, SettingManager.settings.authToken, JsonConvert.SerializeObject(new { Main.clientVersion }));
+
+            if (response.code == HttpStatusCode.OK)
+            {
+                return ApiResponse.OK;
+            }
+            else if (response.code == HttpStatusCode.UpgradeRequired)
+            {
+                return ApiResponse.OLD_VERSION;
+            }
+
+            return ApiResponse.UNAUTHORISED;
         }
         catch (Exception e)
         {
@@ -120,26 +139,30 @@ public class Golf2Api
         }
     }
 
-    public ApiResponse authenticateClient(string name)
-    {   
+    public Tuple<ApiResponse, string> authenticateClient(string name)
+    {
         try
         {
             name = name.Trim(trimChars: new[] { ' ', '\u200b' });
-            Response response = makeRequest("/clientauth", HttpMethod.Post, body: JsonConvert.SerializeObject(new { name = name }));
-
+            Response response = makeRequest("/clientauth", HttpMethod.Post, body: JsonConvert.SerializeObject(new { name = name }));                        
             if (response.code == HttpStatusCode.OK)
             {
-                SettingManager.settings.authToken = JsonConvert.DeserializeObject<ClientAuthResponse>(response.body).response.token;
+                SettingManager.settings.authToken = JsonConvert.DeserializeObject<OKClientAuthResponse>(response.body).response.token;
                 SettingManager.settings.name = name;
                 SettingManager.SaveSettings();
-                return ApiResponse.OK;
+                Debug.Log("settings saved");
+                Debug.Log(SettingManager.settings.name);
+                Debug.Log(SettingManager.settings.authToken);
+                return new Tuple<ApiResponse, string>(ApiResponse.OK, "");
             }
 
-            return ApiResponse.USERNAME_TAKEN;
+            ErrorClientAuthResponse errorResponse = JsonConvert.DeserializeObject<ErrorClientAuthResponse>(response.body);
+ 
+            return new Tuple<ApiResponse, string>(ApiResponse.USERNAME_TAKEN, errorResponse.response.ToUpper());
         }
         catch (Exception)
         {
-            return ApiResponse.NO_INTERNET;
+            return new Tuple<ApiResponse, string>(ApiResponse.NO_INTERNET, "NO INTERNET CONNECTION");
         }
     }
 
@@ -204,13 +227,13 @@ public class Golf2Api
             return ApiResponse.NO_INTERNET;
         }
     }
-    
+
     public ApiResponse leaveSession()
     {
         try
         {
             Response response = makeRequest("/leavesession", HttpMethod.Post, authToken: SettingManager.settings.authToken);
-            
+
             if (response.code == HttpStatusCode.BadRequest)
             {
                 return ApiResponse.NOT_IN_SESSION;
@@ -223,7 +246,7 @@ public class Golf2Api
             return ApiResponse.NO_INTERNET;
         }
     }
-    
+
     public ApiResponse createSession(out string socketToken, bool didRetry = false)
     {
         socketToken = "";
@@ -248,6 +271,5 @@ public class Golf2Api
         {
             return ApiResponse.NO_INTERNET;
         }
-        
     }
 }

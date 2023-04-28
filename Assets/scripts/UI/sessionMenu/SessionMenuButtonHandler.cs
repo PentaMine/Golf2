@@ -5,9 +5,9 @@ public class SessionMenuButtonHandler : MonoBehaviour
 {
     public void Leave()
     {
+        SceneManager.LoadScene("MultiplayerMenu");
         SocketConnection.instance.socketManager.Disconnect();
         new Golf2Api().leaveSession();
-        SceneManager.LoadScene("MultiplayerMenu");
     }
 
     public void Ready()

@@ -5,15 +5,16 @@ using UnityEngine;
 using NativeWebSocket;
 using Newtonsoft.Json;
 
-//using WebSocketSharp;
-
 public class Golf2Socket
 {
     public WebSocket websocket;
     private string socketArg;
-    public bool isAuthorisedToSession;
     public List<string> participants;
     private bool isMapSent;
+    private Vector3 lastPosSent;
+    private bool isFinished;
+
+    // events
 
     public delegate void SocketConnectEvent();
 
@@ -46,9 +47,12 @@ public class Golf2Socket
     public delegate void EndOfGameEvent(List<PlayerScore> scores);
 
     public static event EndOfGameEvent OnGameEnd;
+
     public delegate void ErrorEvent(string reason);
 
     public static event ErrorEvent OnError;
+
+    // event classes
 
     public class SyncData
     {
@@ -101,16 +105,19 @@ public class Golf2Socket
         GAME_FINISHED = 7
     }
 
+    // message classes
+
     private class Message
     {
         public int type;
         public object content;
     }
-    
+
     private class NakMessage
     {
         public int type;
         public Content content;
+
         public class Content
         {
             public string reason;
@@ -254,11 +261,9 @@ public class Golf2Socket
         switch (message.type)
         {
             case (int)InEventType.HANDSHAKE_ACK:
-                isAuthorisedToSession = true;
                 break;
             case (int)InEventType.HANDSHAKE_NAK:
                 HandleNak(messageText);
-                isAuthorisedToSession = false;
                 break;
             case (int)InEventType.SYNCHRONISE:
                 HandleSync(messageText);
@@ -447,18 +452,33 @@ public class Golf2Socket
 
     public void UpdatePos(Vector3 pos, Vector3 velocity)
     {
-        double px = Math.Round(pos.x, 3);
-        double py = Math.Round(pos.y, 3);
-        double pz = Math.Round(pos.z, 3);
+        if (isFinished)
+        {
+            return;
+        }
+        
+        float px = (float)Math.Round(pos.x, 3);
+        float py = (float)Math.Round(pos.y, 3);
+        float pz = (float)Math.Round(pos.z, 3);
+        
+        // don't waste bandwidth if the pos has not changed 
+        pos = new Vector3(px, py, pz);
+        if (pos == lastPosSent)
+        {
+            return;
+        }
 
         double vx = Math.Round(velocity.x, 3);
         double vy = Math.Round(velocity.y, 3);
         double vz = Math.Round(velocity.z, 3);
+        
         websocket.SendText(ComposeMessage(OutEventType.POS_SYNC, new { px, py, pz, vx, vy, vz }));
+        lastPosSent = pos;
     }
-    
+
     public void SendFinishPacket()
     {
+        isFinished = true;
         double time = Math.Round(GameManager.instance.GetGameDuration(), 3);
 
         websocket.SendText(ComposeMessage(
