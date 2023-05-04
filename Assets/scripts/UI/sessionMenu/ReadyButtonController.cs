@@ -26,14 +26,13 @@ public class ReadyButtonController : MonoBehaviour
 
     void ChangeState(bool state)
     {
+        // send to server asynchronously
         if (state)
         {
-            // send to server asynchronously
             new Thread(SocketConnection.instance.socketManager.SetReady).Start();
         }
         else
         {
-            // send to server asynchronously
             new Thread(SocketConnection.instance.socketManager.SetUnready).Start();
         }
     }
@@ -46,7 +45,7 @@ public class ReadyButtonController : MonoBehaviour
         }
         else
         {
-            textComponent.text = SettingManager.settings.lang == SettingManager.Language.ENGLISH ? "READY" : "SPREMAN";;
+            textComponent.text = SettingManager.settings.lang == SettingManager.Language.ENGLISH ? "READY" : "SPREMAN";
         }
     }
 }

@@ -22,7 +22,7 @@ public class SocketConnection : MonoBehaviour
         }
         else
         {
-            socketManager = new Golf2Socket(SocketData.socketArg);
+            socketManager = new Golf2Socket(SocketData.socketArg, SocketData.isSessionOwner);
         }
 
         Golf2Socket.OnError += reason => Debug.LogError(reason);

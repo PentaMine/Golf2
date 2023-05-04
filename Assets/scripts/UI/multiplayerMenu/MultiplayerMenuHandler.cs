@@ -65,8 +65,9 @@ public class MultiplayerMenuHandler : MonoBehaviour
         loadingIcon.enabled = false;
         loadingCanvas.enabled = true;
 
-        new Thread(FetchSessions).Start();
+        // verify auth and fetch sessions asynchronously
         new Thread(VerifyAuth).Start();
+        new Thread(FetchSessions).Start();
 
         OnVerifyAuth += OnAuth;
         OnUsernameConfirmation += OnUsernameCheck;
@@ -93,7 +94,6 @@ public class MultiplayerMenuHandler : MonoBehaviour
 
     public void SubmitUsernameBtn()
     {
-        Debug.Log("FSDGDF");
         loadingIcon.enabled = true;
         new Thread(() => SubmitUsername(usernameInput.text)).Start();
     }
@@ -101,6 +101,7 @@ public class MultiplayerMenuHandler : MonoBehaviour
 
     private void OnAuth(Golf2Api.ApiResponse response)
     {
+        // run on main thread because ui components can only be modified on the main thread
         MainThreadWorker.mainThread.AddJob(() =>
         {
             loadingCanvas.enabled = false;
@@ -112,57 +113,28 @@ public class MultiplayerMenuHandler : MonoBehaviour
 
     void LoadSessionList(List<Golf2Api.Session> sessions)
     {
+        // run on main thread because gameobjects can only be instantiated on the main thread
         MainThreadWorker.mainThread.AddJob(() =>
         {
             foreach (Golf2Api.Session session in sessions)
             {
-                Instantiate(sessionButtonPrefab, Vector3.zero, Quaternion.Euler(Vector3.zero), sessionInfoList.transform).GetComponent<SessionButtonController>().SetData(session.owner, session.participants, session.id);
+                Instantiate(sessionButtonPrefab,/* Vector3.zero, Quaternion.Euler(Vector3.zero), */sessionInfoList.transform)
+                    .GetComponent<SessionButtonController>().SetData(session.owner, session.participants, session.id);
             }
         });
     }
 
     void OnUsernameCheck(Golf2Api.ApiResponse response, string message)
     {
-        bool auth = response == Golf2Api.ApiResponse.OK;
-        
+        // run on main thread because ui components can only be modified on the main thread
         MainThreadWorker.mainThread.AddJob(() =>
         {
             errorMessageComponent.text = message;
-            noAuthCanvas.enabled = !auth;
+            noAuthCanvas.enabled = response != Golf2Api.ApiResponse.OK;
             loadingIcon.enabled = false;
         });
     }
 
-/*
-    private void FixedUpdate()
-    {
-        loadingCanvas.enabled = !isConnectionAttempted;
-        noAuthCanvas.enabled = !auth;
-        noInternetCanvas.enabled = isNoInternet;
-        if (sessions.Count > 0 && !areSessionsLoaded)
-        {
-            foreach (Golf2Api.Session session in sessions)
-            {
-                Instantiate(sessionButtonPrefab, Vector3.zero, Quaternion.Euler(Vector3.zero), sessionInfoList.transform).GetComponent<SessionButtonController>().SetData(session.owner, session.participants, session.id);
-            }
-
-            areSessionsLoaded = true;
-        }
-
-        if (authResponse != null)
-        {
-            loadingIcon.enabled = false;
-            errorMessageComponent.text = authResponse.Item2;
-
-            auth = authResponse.Item1 == Golf2Api.ApiResponse.OK;
-
-            noAuthCanvas.enabled = !auth;
-            authResponse = null;
-        }
-    }
-
-
-*/
     public void CreateSessionButton()
     {
         api.createSession(out string socketArg);

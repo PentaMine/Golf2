@@ -1,34 +1,51 @@
+using System;
 using TMPro;
 using UnityEngine;
 
 public class PlayerListController : MonoBehaviour
 {
+    public GameObject playerNameObject;
+    public GameObject ownerObject;
+
     private const string croText = " (spreman)";
     private const string engText = " (ready)";
-    public GameObject ownerObject;
-    public GameObject participantsObject;
-    private TextMeshProUGUI owner;
-    private TextMeshProUGUI participants;
+    private TextMeshProUGUI ownerTextComp;
+    
+    
     void Awake()
     {
-        owner = ownerObject.GetComponent<TextMeshProUGUI>();
-        participants = participantsObject.GetComponent<TextMeshProUGUI>();
         Golf2Socket.OnPlayerSync += UpdateText;
+        ownerTextComp = ownerObject.GetComponent<TextMeshProUGUI>();
     }
 
-    // Update is called once per frame
-    void UpdateText(Golf2Socket.SyncData data)
+    private void UpdateText(Golf2Socket.SyncData data)
     {
-
-        string readyText = SettingManager.settings.lang == SettingManager.Language.ENGLISH ? engText : croText;
+        ResetList();
         
-        owner.text = data.owner + (data.ready.Contains(data.owner) ? readyText : "");
-        string participantsText = "";
+        string readyText = SettingManager.settings.lang == SettingManager.Language.ENGLISH ? engText : croText;
+        ownerTextComp.text = data.owner + (data.ready.Contains(data.owner) ? readyText : "");
+
         foreach (var participant in data.participants)
         {
-            participantsText += participant + (data.ready.Contains(participant) ? readyText : "") + "\n";
+            string txt = participant + (data.ready.Contains(participant) ? readyText : "");
+            Debug.Log(txt);
+            Instantiate(playerNameObject, transform).GetComponent<PlayerNameController>().SetData(txt, SocketConnection.instance.socketManager.isOwner);
         }
+    }
 
-        participants.text = participantsText;
+    private void ResetList()
+    {
+        foreach (Transform tf in transform.GetComponentsInChildren<Transform>())
+        {
+            if (tf.name != gameObject.name)
+            {
+                Destroy(tf.gameObject);
+            }
+        }
+    }
+    
+    private void OnDestroy()
+    {
+        Golf2Socket.OnPlayerSync -= UpdateText;
     }
 }

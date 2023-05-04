@@ -13,6 +13,7 @@ public class Golf2Socket
     private bool isMapSent;
     private Vector3 lastPosSent;
     private bool isFinished;
+    public bool isOwner;
 
     // events
 
@@ -51,6 +52,10 @@ public class Golf2Socket
     public delegate void ErrorEvent(string reason);
 
     public static event ErrorEvent OnError;
+    
+    public delegate void KickEvent();
+
+    public static event KickEvent OnKick;
 
     // event classes
 
@@ -89,7 +94,8 @@ public class Golf2Socket
         SET_UNREADY = 3,
         POS_SYNC = 4,
         FINISH = 5,
-        REFRESH = 6
+        REFRESH = 6,
+        KICK = 7
     }
 
     // incoming events
@@ -102,7 +108,8 @@ public class Golf2Socket
         SESSION_COUNTDOWN = 4,
         POS_SYNC = 5,
         SESSION_CLOSED = 6,
-        GAME_FINISHED = 7
+        GAME_FINISHED = 7,
+        KICK = 8
     }
 
     // message classes
@@ -216,10 +223,11 @@ public class Golf2Socket
         }
     }
 
-    public Golf2Socket(string socketArg)
+    public Golf2Socket(string socketArg, bool isOwner)
     {
         InitConnection();
         this.socketArg = socketArg;
+        this.isOwner = isOwner;
     }
 
     private void InitConnection()
@@ -258,6 +266,11 @@ public class Golf2Socket
 
         Message message = JsonConvert.DeserializeObject<Message>(messageText);
 
+        /*if (message.type != (int)InEventType.POS_SYNC)
+        {*/
+            Debug.Log(messageText);
+        //}
+            
         switch (message.type)
         {
             case (int)InEventType.HANDSHAKE_ACK:
@@ -282,6 +295,9 @@ public class Golf2Socket
                 break;
             case (int)InEventType.GAME_FINISHED:
                 HandleGameEnd(messageText);
+                break;
+            case (int)InEventType.KICK:
+                HandleKick();
                 break;
         }
     }
@@ -308,6 +324,11 @@ public class Golf2Socket
         scores = scores.OrderBy(s => s.score).ToList();
 
         if (OnGameEnd != null) OnGameEnd(scores);
+    }
+
+    private void HandleKick()
+    {
+        if (OnKick != null) OnKick();
     }
 
     private void HandleEndOfSession()
@@ -418,7 +439,7 @@ public class Golf2Socket
 
     public void SetReady()
     {
-        if (!SocketData.isSessionOwner)
+        if (!isOwner)
         {
             websocket.SendText(ComposeMessage(OutEventType.SET_READY));
             return;
@@ -491,9 +512,15 @@ public class Golf2Socket
     {
         websocket.SendText(ComposeMessage(OutEventType.REFRESH));
     }
+    
+    public void KickPlayer(string playerName)
+    {
+        websocket.SendText(ComposeMessage(OutEventType.KICK, new {name = playerName}));
+    }
 
     public void ResetSession()
     {
         isMapSent = false;
+        isFinished = false;
     }
 }

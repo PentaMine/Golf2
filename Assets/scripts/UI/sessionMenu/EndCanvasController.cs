@@ -10,7 +10,8 @@ public class EndCanvasController : MonoBehaviour
 
     private void HandleSessionEnd()
     {
-        Canvas endCanvas = GameObject.FindGameObjectWithTag("EndScreen").GetComponent<Canvas>();
+        //Canvas endCanvas = GameObject.FindGameObjectWithTag("EndScreen").GetComponent<Canvas>();
+        Canvas endCanvas = GetComponent<Canvas>();
         endCanvas.enabled = true;
         Invoke("Exit", 1);
     }
