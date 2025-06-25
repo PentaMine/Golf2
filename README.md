@@ -14,6 +14,6 @@ It won first place.
 
 The server code can be found in it's own [repo](https://github.com/PentaMine/Golf2Server)
 
-# Thecnical docs
+# Technical docs
 
 The technical documentation submitted to the competition committee can be found [here](https://drive.google.com/file/d/14HYHU1Vh93HplRwyC0Qw6Jn8VeAZ_rZE/view?usp=sharing)
